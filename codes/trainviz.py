@@ -52,11 +52,6 @@ def plot_predicted_scores(cv_scores, batch, title=""):
     figname = OUTPUT_DIR + str(batch) + "/decision thresholds/" + "{}.png".format(title)
     fig.savefig(figname, dpi=400)
 
-    fig.tight_layout()
-    plt.show(block=False)
-    plt.pause(3)
-    plt.close()
-
 
 def plot_precision_recall(y_true, y_score, baseline, batch, title=""):
     """
@@ -105,11 +100,6 @@ def plot_precision_recall(y_true, y_score, baseline, batch, title=""):
               fontproperties=AXIS)
     fig.savefig(figname, dpi=400)
 
-    fig.tight_layout()
-    plt.show(block=False)
-    plt.pause(3)
-    plt.close()
-
 
 def plot_auc_roc(clf, data, batch, title=""):
     """
@@ -151,11 +141,6 @@ def plot_auc_roc(clf, data, batch, title=""):
               fontproperties=AXIS)
     fig.savefig(figname, dpi=400)
 
-    fig.tight_layout()
-    plt.show(block=False)
-    plt.pause(3)
-    plt.close()
-
 
 def plot_feature_importances(importances, col_names, batch, n=5, title=""):
     """
@@ -184,8 +169,3 @@ def plot_feature_importances(importances, col_names, batch, n=5, title=""):
     plt.title("Feature Importance: Top {}\n".format(n) + title,
               fontproperties=AXIS)
     fig.savefig(figname, dpi=400)
-
-    fig.tight_layout()
-    plt.show(block=False)
-    plt.pause(3)
-    plt.close()
