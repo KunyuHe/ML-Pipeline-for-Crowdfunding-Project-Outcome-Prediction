@@ -39,7 +39,7 @@ METRICS_NAMES = ["Accuracy", "Precision", "Recall", "F1 Score", "AUC ROC Score"]
 METRICS = [accuracy_score, precision_score, recall_score, f1_score, roc_auc_score]
 
 THRESHOLDS = [0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.4, 0.45, 0.475, 0.5,
-              0.525, 0.55, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99]
+              0.525, 0.55, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99]
 SEED = 123
 
 GRID_SEARCH_PARAMS = {"KNN": {
@@ -56,9 +56,9 @@ GRID_SEARCH_PARAMS = {"KNN": {
 
                       "Decision Tree": {
                             'criterion': ["entropy", "gini"],
-                            'min_samples_split': list(np.arange(0.02, 0.05, 0.01)),
-                            'max_depth': list(range(4, 11)),
-                            'max_features': list(range(4, 15, 2))
+                            'min_samples_split': list(np.arange(0.02, 0.11, 0.02)),
+                            'max_depth': list(range(7, 23, 2)),
+                            'max_features': list(range(7, 51, 4))
                             },
 
                       "Linear SVM": {
@@ -67,8 +67,8 @@ GRID_SEARCH_PARAMS = {"KNN": {
                                      },
 
                       "Bagging": {
-                                  'max_samples': [0.05, 0.1, 0.2, 0.5],
-                                  'max_features': list(range(4, 15, 2))
+                                  'max_samples': [0.05, 0.1, 0.2, 0.3, 0.4, 0.5],
+                                  'max_features': list(range(7, 51, 4))
                                   },
 
                       "Boosting":{
@@ -77,9 +77,9 @@ GRID_SEARCH_PARAMS = {"KNN": {
                                   },
 
                       "Random Forest": {
-                            'min_samples_split': list(np.arange(0.01, 0.06, 0.02)),
-                            'max_depth': list(range(4, 11)),
-                            'max_features': list(range(4, 15, 2))
+                            'min_samples_split': list(np.arange(0.02, 0.11, 0.02)),
+                            'max_depth': list(range(7, 23, 2)),
+                            'max_features': list(range(7, 51, 4))
                             }
                       }
 
@@ -87,10 +87,10 @@ DEFAULT_ARGS = {"KNN": {'n_jobs': -1},
                 "Logistic Regression": {'random_state': SEED},
                 "Decision Tree": {'random_state': SEED},
                 "Linear SVM": {'random_state': SEED, 'max_iter': 200},
-                "Bagging": {'n_estimators': 50, 'random_state': SEED,
+                "Bagging": {'n_estimators': 500, 'random_state': SEED,
                             'oob_score': True, 'n_jobs': -1},
-                "Boosting": {'n_estimators': 100, 'random_state': SEED},
-                "Random Forest": {'n_estimators': 300, 'random_state': SEED,
+                "Boosting": {'n_estimators': 1000, 'random_state': SEED},
+                "Random Forest": {'n_estimators': 1000, 'random_state': SEED,
                                   'oob_score': True, 'n_jobs': -1}}
 
 
