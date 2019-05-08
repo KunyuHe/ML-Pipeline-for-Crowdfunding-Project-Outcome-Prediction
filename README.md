@@ -168,7 +168,7 @@ For feature selection, I dropped some non-numerical variables because they conta
 
 ### 5.3 Train Test Split
 
-In order to achieve best future predictions, we need to find the best model based on historical data. Hence in this practice, **we do not have true actual data** because they are not yet available. The whole data set would be our training set. However, for evaluation and optimization purposes, we would like to split it into training and validation sets.
+In order to achieve best future predictions, we need to find the best model based on historical data. Hence in this practice, **we do not have true actual data** because they are not yet available. The whole data set would be our training set. However, for evaluation and optimization purposes, we would like to split it into training and validation sets. The `time_train_test_split()` function in the `featureEngineering` module implements this.
 
 As the data spans over time and we are predicting whether a project would get fully funded within 60 days *(nearly two months)* of posting, I applied temporal train test split technique with test sets spanning 6 months. In other words, **I created training and test sets over time, and the test sets are six months long and the training sets are all the data before each test set**.
 
@@ -220,7 +220,7 @@ It seems that although for the first split our training set spans only one month
 
 ### 6.2 Model Tuning
 
-#### Find the Best Decision Threshold
+#### 6.2.1 Find the Best Decision Threshold
 
 Users can build classifiers of their choices, and the first step after that, would be going through the automate process of finding the best decision threshold *(a test observation would be labeled `"positive"` when its predicted probability exceeds the decision threshold in a binary classification case)* within a predefined grid of thresholds *(`THRESHOLDS` in the code script)*.
 
@@ -230,9 +230,35 @@ With 10-fold cross validation by default, the classifier would return a predicte
 
 
 
+### 6.3 Model Evaluations
+
+#### 6.3.1 Tables of Performance Metrics on All the Test Sets
+
+After finding the best set of hyper-parameters of a specific model according to a specific metrics on the training set, the so far "best" model would be validated on the test set. Performances of all the "best" models on any of the three test sets would be recorded in `CSV` format under `../log/evaluations/` directory. There are three folders under the directory, each stores the `performances.csv` table recording performance metrics listed above. Take `test set 1`, which spans Aug. 2012 - Jan. 2013 as an example.
+
+In terms of **Precision**, the best models on `test set 1` are listed below:
+
+| Type                | Threshold | Hyperparameters                                      | Default Parameters                     | Accuracy | Precision | Recall | F1 Score | AUC ROC Score |
+| ------------------- | --------- | ---------------------------------------------------- | -------------------------------------- | -------- | --------- | ------ | -------- | ------------- |
+| Logistic Regression | 0.02      | {'penalty': 'l1', 'solver': 'liblinear',   'C': 0.1} | {'random_state': 123}                  | 0.7421   | 0.7423    | 0.9990 | 0.8520   | 0.5007        |
+| Linear SVM          | 0.45      | {'penalty': 'l2', 'C': 0.01}                         | {'random_state': 123, 'max_iter': 200} | 0.7421   | 0.7421    | 1.0000 | 0.8520   | 0.5001        |
+
+*(Best Models on Test Set 1 -- Accuracy)*
 
 
+$$
+Accuracy =
+$$
 
+$$
+Accuracy = \frac{TP+TN}{TP+FP+TN+FN}
+$$
+
+The two models have the same accuracy. It means they can correctly labels projects that would get fully funded within 60 days of posting or not correctly about 74.2% of the time, and they are as good as the other in terms of accuracy. The other performances metrics are nearly the same, too. In order to decide which one is better, we need to look further into their precision against percentage of population.
+
+![]([https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/1/precision%20recall/(Linear%20SVM%20--%20Accuracy).png](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/1/precision recall/(Linear SVM -- Accuracy).png))
+
+![]([https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/1/precision%20recall/(Logistic%20Regression%20--%20Accuracy).png](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/1/precision recall/(Logistic Regression -- Accuracy).png))
 
 
 
