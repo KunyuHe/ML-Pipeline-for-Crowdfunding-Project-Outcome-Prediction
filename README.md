@@ -1,6 +1,6 @@
 # ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/990caf02345d986dbba9/maintainability)](https://codeclimate.com/github/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/maintainability) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/80262728540b41d3b6aca75031a74a1e)](https://www.codacy.com/app/kunyuhe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction&amp;utm_campaign=Badge_Grade)
+[![Maintainability](https://api.codeclimate.com/v1/badges/990caf02345d986dbba9/maintainability)](https://codeclimate.com/github/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/maintainability) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/80262728540b41d3b6aca75031a74a1e)](https://www.codacy.com/app/kunyuhe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction&amp;utm_campaign=Badge_Grade) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/master?filepath=%2FEDA%2FEDA.ipynb)
 
 
 
@@ -73,5 +73,44 @@ When the program runs, messages would be printed to console to give you a sense 
 *   Receiver Operating Characteristic Curve
 *   Feature Importance (Top 5) Bar Plots (if applicable)
 
+
+
 They would stay for 3 seconds and close automatically. Then they would be saved to `/log/images/`. **Please do not close them manually, or your progress would be killed**.
+
+
+
+## 2. Get Data
+
+*   Output Directory: `./data/ `   *(All paths hereby would be relative to the `/codes/` directory)*
+
+
+
+Data can be manually downloaded from [this link](https://canvas.uchicago.edu/courses/20751/files/2388413/download?download_frd=1) on the `University of Chicago Canvas` as given. It is stored in the `./data/` directory as `projects_2012_2013.csv`.
+
+The data is a CSV file that has one row for each project posted with a column for `date_posted` (the date the project was posted) and a column for `datefullyfunded` (the date the project was fully funded). During  The data spans Jan 1, 2012 to Dec 31, 2013. Description of the variables can be found [here](<https://www.kaggle.com/c/kdd-cup-2014-predicting-excitement-at-donors-choose/data>).
+
+
+
+## 3. ETL
+
+*   Input Directory: `../data/`
+*   Output Directory: `../data/`
+*   Code Script: [etl.py](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/codes/etl.py)
+
+
+
+As data comes as CSV, I used `Pandas` to read it into Python. Two columns `date_posted` and `datefullyfunded` are converted into `datatime` and the target `fully_funded` is generated based on whether at most 59 days had passed between those two dates. We label the observation "positive" if it gets fully funded within 60 days, and "negative" when it fails to do so.
+
+
+
+## 4. EDA
+
+*   Input Directory: `../data/`
+*   Output Directory: `../EDA/images/`
+*   Notebook: [EDA.ipynb](https://mybinder.org/v2/gh/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/master?filepath=%2FEDA%2FEDA.ipynb)
+*   Code Script: [viz.py](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/codes/viz.py)
+
+
+
+*Try the interactive Jupyter Notebook supported by `binder` if you click on the badge above*!
 
