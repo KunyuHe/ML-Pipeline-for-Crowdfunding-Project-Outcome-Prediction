@@ -102,15 +102,15 @@ def ask():
     """
     """
     print("\nUp till now we support:")
-    for i in range(len(MODEL_NAMES)):
-        print("{}. {}".format(i, MODEL_NAMES[i]))
+    for i, model_name in enumerate(MODEL_NAMES):
+        print("{}. {}".format(i, model_name))
     model_index = int(input(("We use default Decision Tree as the benchmark.\n"
                              "Please input a classifier index:\n")))
 
     print(("\nUp till now we use the following metrics to evaluate the"
            " fitted classifiers on the validation and test set."))
-    for i in range(len(METRICS)):
-        print("{}. {}".format(i, METRICS_NAMES[i].title()))
+    for i, metric_name in enumerate(METRICS_NAMES):
+        print("{}. {}".format(i, metric_name.title()))
     metric_index = int(input("Please input a metrics index:\n"))
 
     return model_index, metric_index
@@ -136,7 +136,6 @@ def build_benchmark(data, metric_index):
 
     benchmark = DecisionTreeClassifier(**DEFAULT_ARGS["Decision Tree"])
     benchmark.fit(X_train, y_train)
-    predicted_probs = benchmark.predict_proba(X_test)[:, 1]
     benchmark_score = METRICS[metric_index](y_test, benchmark.predict(X_test))
 
     print("\n{} of the benchmark default decision tree model is {:.4f}.\n".\

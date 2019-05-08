@@ -394,8 +394,9 @@ def process():
     trains, tests, _ = time_train_test_split(data, 'date_posted', freq='6M')
     imputer_index, scaler_index = ask()
 
-    for i in range(len(trains)):
-        train, test = trains[i], tests[i]
+    for i, train in enumerate(trains):
+        test = tests[i]
+
         X_train, y_train = split(train)
         X_test, y_test = split(test)
 

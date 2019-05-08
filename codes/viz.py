@@ -48,7 +48,7 @@ def read_data(drop_na=False):
     return data
 
 
-def bar_plot(ax, data, column, sub=True, labels=["", "", ""], x_tick=[None, None]):
+def bar_plot(ax, data, column, labels, sub=True, x_tick=[None, None]):
     """
     Create a bar plot from a categorical vairable in the data set.
 
