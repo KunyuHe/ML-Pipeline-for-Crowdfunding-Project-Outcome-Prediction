@@ -245,8 +245,9 @@ In terms of **Precision**, the best models on `test set 1` are listed below:
 
 *(Best Models on Test Set 1 -- Accuracy)*
 
+\[Accuracy = \frac{TP+TN}{TP+FP+TN+FN}\]
 
-$Accuracy = \frac{TP+TN}{TP+FP+TN+FN}$
+$$Accuracy = \frac{TP+TN}{TP+FP+TN+FN}$$
 
 The two models have the same accuracy. It means they can correctly labels projects that would get fully funded within 60 days of posting or not correctly about 74.2% of the time, and they are as good as the other in terms of accuracy. The other performances metrics are nearly the same, too. In order to decide which one is better, we need to look further into their precision against percentage of population.
 
