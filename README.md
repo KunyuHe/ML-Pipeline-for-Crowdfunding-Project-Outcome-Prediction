@@ -12,6 +12,8 @@ Change you working directory to the folder where you want the project. Clone the
 $ git clone https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction.git
 ```
 
+
+
 Then, run one of the following:
 
 ### 0.1 Windows
@@ -21,12 +23,16 @@ $ chmod u+x run.sh
 $ run.sh
 ```
 
+
+
 ### 0.2 Unix/Linux
 
 ```console
 $ chmod +x script.sh
 $ ./run.sh
 ```
+
+
 
 ## 1. Introduction
 
@@ -40,9 +46,13 @@ The pipeline has six components:
 4.  Build Classifier
 5.  Evaluate Classifier
 
-The pipeline currently supports **seven classification algorithms**:
 
-| Imputation       | Scalers         | Classification Algorithms | Metrics   |
+
+The pipeline currently supports **seven classification algorithms and five evaluation metrics**, it also implements **two imputation methods and two different scalers**. User can run any configuration of his/her choice. The implemented configurations are listed below.
+
+
+
+| Imputation Methods | Scalers         | Classification Algorithms | Metrics   |
 | ------------- | --------------- | ------------------------- | --------- |
 | Column Mean   | Standard Scaler | KNN                       | Accuracy  |
 | Column Median | Mini-max Scaler | Logistic Regression       | Precision |
@@ -51,4 +61,17 @@ The pipeline currently supports **seven classification algorithms**:
 |               |                 | Bagging                   | AUC ROC   |
 |               |                 | Boosting                  |           |
 |               |                 | Random Forest             |           |
+
+
+
+Upon running the program, use `keyboard input` to specify your configuration when notified to. You can also choose to run all possible configurations by sequence *(but it takes really long)*.
+
+When the program runs, messages would be printed to console to give you a sense about what it is doing. Also at some points, there would be prompted plots reporting one of the following:
+
+*   Distribution of the Predicted Probabilities
+*   Precision, Recall Curve and Percent of Polpulation
+*   Receiver Operating Characteristic Curve
+*   Feature Importance (Top 5) Bar Plots (if applicable)
+
+They would stay for 3 seconds and close automatically. Then they would be saved to `/log/images/`. **Please do not close them manually, or your progress would be killed**.
 

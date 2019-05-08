@@ -87,10 +87,10 @@ DEFAULT_ARGS = {"KNN": {'n_jobs': -1},
                 "Logistic Regression": {'random_state': SEED},
                 "Decision Tree": {'random_state': SEED},
                 "Linear SVM": {'random_state': SEED, 'max_iter': 200},
-                "Bagging": {'n_estimators': 500, 'random_state': SEED,
+                "Bagging": {'n_estimators': 50, 'random_state': SEED,
                             'oob_score': True, 'n_jobs': -1},
-                "Boosting": {'n_estimators': 1000, 'random_state': SEED},
-                "Random Forest": {'n_estimators': 1000, 'random_state': SEED,
+                "Boosting": {'n_estimators': 100, 'random_state': SEED},
+                "Random Forest": {'n_estimators': 100, 'random_state': SEED,
                                   'oob_score': True, 'n_jobs': -1}}
 
 
