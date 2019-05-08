@@ -42,7 +42,7 @@ The pipeline has six components:
 
 The pipeline currently supports **seven classification algorithms**:
 
-| Scalers       | Scalers         | Classification Algorithms | Metrics   |
+| Imputation       | Scalers         | Classification Algorithms | Metrics   |
 | ------------- | --------------- | ------------------------- | --------- |
 | Column Mean   | Standard Scaler | KNN                       | Accuracy  |
 | Column Median | Mini-max Scaler | Logistic Regression       | Precision |
