@@ -77,8 +77,6 @@ GRID_SEARCH_PARAMS = {"KNN": {
                                   },
 
                       "Random Forest": {
-                            'min_samples_split': list(np.arange(0.02, 0.11, 0.02)),
-                            'max_depth': list(range(7, 23, 2)),
                             'max_features': list(range(7, 51, 4))
                             }
                       }
@@ -90,7 +88,7 @@ DEFAULT_ARGS = {"KNN": {'n_jobs': -1},
                 "Bagging": {'n_estimators': 50, 'random_state': SEED,
                             'oob_score': True, 'n_jobs': -1},
                 "Boosting": {'n_estimators': 100, 'random_state': SEED},
-                "Random Forest": {'n_estimators': 100, 'random_state': SEED,
+                "Random Forest": {'n_estimators': 1000, 'random_state': SEED,
                                   'oob_score': True, 'n_jobs': -1}}
 
 
