@@ -6,7 +6,6 @@ Description: contains a function that reads data and data types, and many
 Author:      Kunyu He, CAPP'20
 """
 
-import os
 import random
 import seaborn as sns
 import pandas as pd

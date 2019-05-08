@@ -1,7 +1,7 @@
 """
 Summary:     A collections of functions to generate features.
 
-Description: 
+Description:
 Author:      Kunyu He, CAPP'20
 """
 
@@ -10,7 +10,6 @@ import pickle
 import pandas as pd
 import numpy as np
 
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OrdinalEncoder, StandardScaler, MinMaxScaler
 from viz import read_data
 
@@ -37,7 +36,7 @@ TO_COMBINE = {'teacher_prefix': {'female': ['Mrs.', 'Ms.'],
 
 TO_BINARIES = {'school_charter': 'auto',
                'school_magnet': 'auto',
-               'poverty_level': [['highest poverty', 'high poverty', 
+               'poverty_level': [['highest poverty', 'high poverty',
                                   'moderate poverty', 'low poverty']],
                'grade_level': [['Grades PreK-2', 'Grades 3-5',
                                 'Grades 6-8', 'Grades 9-12']],
@@ -78,7 +77,6 @@ def drop_max_outliers(data, drop_vars):
 
     """
     for col_name, n in drop_vars.items():
-        enc = OrdinalEncoder()
         data.drop(data.nlargest(n, col_name, keep='all').index,
                   axis=0, inplace=True)
 
@@ -111,7 +109,7 @@ def to_combine(data, to_combine_vars):
     return data
 
 
-def to_binary(data, to_bin_vars=TO_BINARIES):
+def to_binary(data, to_bin_vars):
     """
     Takes a data set and a dict of variables that needed to be trasformed to
     binaries, performs the transformations and returns the modified data set.
@@ -302,7 +300,7 @@ def scale(X_train, X_test, scaler_index):
     Asks user for the scaler to use, or uses default standard scaler. Fits it
     on the training data and scales the test data with it if test data is
     provided.
-    
+
     Inputs:
         - X_train (arry): training features.
         - X_test (array): testing features.
@@ -393,7 +391,7 @@ def process():
           format(TO_ONE_HOT))
 
     # split the data into training and test sets
-    trains, tests, gaps = time_train_test_split(data, 'date_posted', freq='6M')
+    trains, tests, _ = time_train_test_split(data, 'date_posted', freq='6M')
     imputer_index, scaler_index = ask()
 
     for i in range(len(trains)):

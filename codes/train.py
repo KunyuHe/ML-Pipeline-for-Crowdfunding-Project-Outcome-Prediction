@@ -10,7 +10,7 @@ import pickle
 import csv
 import numpy as np
 
-from sklearn.model_selection import cross_val_predict, StratifiedKFold
+from sklearn.model_selection import StratifiedKFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -375,7 +375,7 @@ if __name__ == "__main__":
                     with open(OUTPUT_DIR + 'snapshots/' + str(BATCH) + '/{}.pickle'.format(SNAP_SHOTS_COUNT), 'wb') as handle:
                         pickle.dump(logs, handle)
                     SNAP_SHOTS_COUNT += 1
-            
+
             with open(OUTPUT_DIR + 'evaluations/' + str(BATCH) + OUTPUT_FILE, "w", newline="") as file:
                 writer = csv.writer(file)
                 writer.writerows(logs)

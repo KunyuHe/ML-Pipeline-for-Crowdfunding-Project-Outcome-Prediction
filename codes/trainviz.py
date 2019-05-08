@@ -6,8 +6,6 @@ Description: contains a function that reads data and data types, and many
 Author:      Kunyu He, CAPP'20
 """
 
-import json
-import random
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -124,7 +122,7 @@ def plot_auc_roc(clf, data, batch, title=""):
     fpr["micro"], tpr["micro"], _ = roc_curve(y_test.ravel(), y_score.ravel())
     roc_auc["micro"] = auc(fpr["micro"], tpr["micro"])
 
-    fig, ax = plt.subplots()
+    fig, _ = plt.subplots()
     plt.plot(fpr[POSITIVE], tpr[POSITIVE], color='darkorange', lw=1.5,
              label='ROC curve (area = {:.4f})'.format(roc_auc[POSITIVE]))
     plt.plot([0, 1], [0, 1], color='navy', lw=1.5, linestyle='--')
@@ -157,7 +155,7 @@ def plot_feature_importances(importances, col_names, batch, n=5, title=""):
     indices = np.argsort(importances)[::-1][:n]
     labels = col_names[indices][::-1]
 
-    fig, ax = plt.subplots(figsize=[12, 8])
+    fig, _ = plt.subplots(figsize=[12, 8])
     plt.barh(range(n), sorted(importances, reverse=True)[:n][::-1], color='g',
              alpha=0.4, edgecolor=['black']*n)
 
