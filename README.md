@@ -258,7 +258,7 @@ The two models have the same accuracy. It means they can correctly labels projec
 
 ![]([https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/1/precision%20recall/(Linear%20SVM%20--%20Accuracy).png](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/1/precision recall/(Linear SVM -- Accuracy).png))
 
-![]([https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/1/precision%20recall/(Logistic%20Regression%20--%20Accuracy).png](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/1/precision recall/(Logistic Regression -- Accuracy).png))
+![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/1/precision recall/\(Logistic Regression -- Accuracy\).png)
 
 
 
