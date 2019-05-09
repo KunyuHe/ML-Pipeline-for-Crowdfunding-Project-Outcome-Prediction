@@ -308,4 +308,10 @@ So, for example, if I were to make recommendations to someone who's working on t
 
 Three models all have perfect precision at 5%, which means they can perfectly detect the 5% of posted projects that are at highest risk to fail to get fully funded in 60 days. However, among these models I would recommend Random Forest. Both Boosting and Logistic Regression use a decision threshold of 0.01, which means they are extremely vulnerable to changes in the distribution of predicted probabilities of future observations. Random Forest is robust to changes in data, and the training process can be expedited with parallel computing.  Further, it has lower variance compared to the two, indicated by high AUC ROC score. Visualize its metrics.
 
-![]
+
+
+![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/dt(Random%20Forest%20--%20AUC_ROC).png)
+
+![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/pr(Random%20Forest%20--%20AUC_ROC).png)
+
+![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/auc(Random%20Forest%20--%20AUC_ROC).png)
