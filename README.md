@@ -236,7 +236,9 @@ With 10-fold cross validation by default, the classifier would return a predicte
 
 After finding the best set of hyper-parameters of a specific model according to a specific metrics on the training set, the so far "best" model would be validated on the test set. Performances of all the "best" models on any of the three test sets would be recorded in `CSV` format under `../log/evaluations/` directory. There are three folders under the directory, each stores the `performances.csv` table recording performance metrics listed above. Take `test set 1`, which spans Aug. 2012 - Jan. 2013 as an example.
 
-In terms of **Precision**, the best models on `test set 1` are listed below:
+##### Accuracy
+
+In terms of accuracy, the best models on `test set 1` are listed below:
 
 | Type                | Threshold | Hyperparameters                                      | Default Parameters                     | Accuracy | Precision | Recall | F1 Score | AUC ROC Score |
 | ------------------- | --------- | ---------------------------------------------------- | -------------------------------------- | -------- | --------- | ------ | -------- | ------------- |
@@ -253,4 +255,21 @@ The two models have the same accuracy. It means they can correctly labels projec
 
 ![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/(Logistic%20Regression%20--%20Accuracy).png)
 
+Both models beat the baseline, which is the fraction of fully funded projects with a collecting time less than 60 days in the test set, 74.2%. This actually means that on a sample that is large enough, **these models are not much better than randomly guessing** in terms of accuracy. This is disappointing.
 
+
+
+**Precision**
+
+| Type       | Threshold | Hyperparameters                          | Default Parameters                                           | Accuracy | Precision | Recall   | F1 Score | AUC ROC Score |
+| ---------- | --------- | ---------------------------------------- | ------------------------------------------------------------ | -------- | --------- | -------- | -------- | ------------- |
+| Bagging    | 0.98      | {'max_samples': 0.5, 'max_features': 39} | {'n_estimators': 50, 'oob_score': True,   'n_jobs': -1, 'random_state': 123} | 0.259072 | 1         | 0.001531 | 0.003057 | 0.500765      |
+| Linear SVM | 0.99      | {'penalty': 'l2', 'C': 0.001}            | {'random_state': 123, 'max_iter': 200}                       | 0.257996 | 1         | 8.06E-05 | 0.000161 | 0.50004       |
+
+*(Best Models on Test Set 1 -- Precision)*
+
+
+
+![](http://www.sciweavers.org/upload/Tex2Img_1557359319/eqn.png)
+
+Precision measures that among all the projects that we predicted would get fully funded within 60 days of posting, the fraction of those who actually meets the criterion. Hence, as we raise the decision threshold and become really selective to label any observation as `"positive"`, we would get high precision as we might only categorize one or two to be `"positive"`. **In practice, both models are useless, unless we can only help one or two crowdfunding projects** so no further analysis is needed.
