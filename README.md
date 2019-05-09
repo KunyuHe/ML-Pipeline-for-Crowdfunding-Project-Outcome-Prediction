@@ -235,8 +235,6 @@ With 10-fold cross validation by default, the classifier would return a predicte
 
 ### 6.3 Model Evaluations
 
-#### 6.3.1 Tables of Performance Metrics on All the Test Sets
-
 After finding the best set of hyper-parameters of a specific model according to a specific metrics on the training set, the so far "best" model would be validated on the test set. Performances of all the "best" models on any of the three test sets would be recorded in `CSV` format under `../log/evaluations/` directory. There are three folders under the directory, each stores the `performances.csv` table recording performance metrics listed above. Take `test set 1`, which spans Aug. 2012 - Jan. 2013 as an example.
 
 
@@ -293,7 +291,7 @@ For recall, the story is the same. As long as we **do not have unlimited resourc
 
 
 
-#### 6.3.2 Precision at Proportion of Population
+## 7. Policy Recommendation
 
 As stated above, in practice we cannot intervene with all the posted projects and help them succeed within 60 days. As long as our resources are limited, we always need to find out the projects that are at highest risks to fail with high precision. This makes a lot of models useful again, even including those who can not beat a random guess model on a infinitely large sample.
 
@@ -311,14 +309,28 @@ So, for example, if I were to make recommendations to someone who's working on t
 
 Three models all have perfect precision at 5%, which means they can perfectly detect the 5% of posted projects that are at highest risk to fail to get fully funded in 60 days. However, among these models I would recommend Random Forest. Both Boosting and Logistic Regression use a decision threshold of 0.01, which means they are extremely vulnerable to changes in the distribution of predicted probabilities of future observations. Random Forest is robust to changes in data, and the training process can be expedited with parallel computing.  Further, it has lower variance compared to the two, indicated by high AUC ROC score. Visualize its metrics.
 
-
-
 ![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/dt(Random%20Forest%20--%20AUC%20ROC%20Score).png)
 
 ![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/pr(Random%20Forest%20--%20AUC%20ROC%20Score).png)
 
 ![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/auc(Random%20Forest%20--%20AUC%20ROC%20Score).png)
 
-#### 6.3.3 Test Perfomaces over Time
 
 
+#### 6.3.3 Test Perfomances over Time
+
+Check test performances of our recommended model over time in `test set 0` and `test set 2`.
+
+| Type              | Threshold | Default Parameters                                           | Accuracy | Precision | Recall | F1 Score | AUC ROC Score | p_at_0.01 | p_at_0.02 | p_at_0.05 |
+| ----------------- | --------- | ------------------------------------------------------------ | -------- | --------- | ------ | -------- | ------------- | --------- | --------- | --------- |
+| 2012.02 - 2012.07 | 0.7       | {'n_estimators': 1000,'max_features': 15, oob_score': True, 'n_jobs': -1, 'random_state': 123} | 0.5811   | 0.7375    | 0.5973 | 0.6601   | 0.5719        | 1         | 1         | 1         |
+| 2012.08 - 2013.01 | 0.7       | {'n_estimators': 1000,'max_features': 15, oob_score': True, 'n_jobs': -1, 'random_state': 123} | 0.5762   | 0.8331    | 0.5362 | 0.6525   | 0.6136        | 1         | 1         | 1         |
+| 2013.02 - 2013.07 | 0.7       | {'n_estimators': 1000,'max_features': 15, oob_score': True, 'n_jobs': -1, 'random_state': 123} | 0.6069   | 0.7752    | 0.5941 | 0.6727   | 0.6140        | 1         | 1         | 1         |
+
+*(Recommended Model on All Test Sets)*
+
+
+
+We can see that our **recommended model keeps a perfect precision at 5% level across all test sets**. In other words, it can perfectly detect the 5% of posted projects that are at highest risk to fail to get fully funded in 60 days in the past.
+
+In terms of other metrics, we notice that AUC ROC score increases as training set grows larger. This means **our model is robust to change of data, and even benefits from an enlarged training set**.
