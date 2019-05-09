@@ -290,27 +290,22 @@ For recall, the story is the same. As long as we **do not have unlimited resourc
 
 
 
-**F-1 Score**
-
-
-
-
-
-**AUC ROC**
-
-
-
 #### 6.3.2 Precision at Proportion of Population
 
 As stated above, in practice we cannot intervene with all the posted projects and help them succeed within 60 days. As long as our resources are limited, we always need to find out the projects that are at highest risks to fail with high precision. This makes a lot of models useful again, even including those who can not beat a random guess model on a infinitely large sample.
 
 So, for example, if I were to make recommendations to someone who's working on this model to identify 5% of posted projects that are at highest risk, I would consider the following models *(there are many models with precision equals to 1 at 5% and here I only keep the ones with either highest AUC ROC, F-1 score or accuracy)*:
 
-| Model         | Threshold | Hyperparameters      | Default Parameters                                           | Accuracy | Precision | Recall   | F1 Score | AUC ROC Score | p_at_0.01 | p_at_0.02 | p_at_0.05 |
-| ------------- | --------- | -------------------- | ------------------------------------------------------------ | -------- | --------- | -------- | -------- | ------------- | --------- | --------- | --------- |
-| Random Forest | 0.7       | {'max_features': 15} | {'n_estimators': 1000, 'oob_score': True,   'n_jobs': -1, 'random_state': 123} | 0.5762   | 0.833146  | 0.536234 | 0.652501 | 0.613638      | 1         | 1         | 1         |
-|               |           |                      |                                                              |          |           |          |          |               |           |           |           |
-|               |           |                      |                                                              |          |           |          |          |               |           |           |           |
+| Model               | Threshold | Hyperparameters                                        | Default Parameters                                           | Accuracy | Precision | Recall | F1 Score | AUC ROC Score | p_at_0.01 | p_at_0.02 | p_at_0.05 |
+| ------------------- | --------- | ------------------------------------------------------ | ------------------------------------------------------------ | -------- | --------- | ------ | -------- | ------------- | --------- | --------- | --------- |
+| Random Forest       | 0.7       | {'max_features': 15}                                   | {'n_estimators': 1000, 'oob_score': True,   'n_jobs': -1, 'random_state': 123} | 0.5762   | 0.833146  | 0.5362 | 0.6525   | 0.6136        | 1         | 1         | 1         |
+| Boosting            | 0.01      | {'algorithm': 'SAMME.R', 'learning_rate':   0.001}     | {'n_estimators': 100, 'random_state': 123}                   | 0.7421   | 0.7421    | 1      | 0.8519   | 0.5           | 1         | 1         | 1         |
+| Logistic Regression | 0.01      | {'penalty': 'l1', 'solver': 'liblinear',   'C': 0.001} | {'random_state': 123}                                        | 0.7421   | 0.7421    | 1      | 0.8519   | 0.5           | 1         | 1         | 1         |
+
+*(Best Models on Test Set 1 -- Precision at 5%)*
 
 
 
+Three models all have perfect precision at 5%, which means they can perfectly detect the 5% of posted projects that are at highest risk to fail to get fully funded in 60 days. However, among these models I would recommend Random Forest. Both Boosting and Logistic Regression use a decision threshold of 0.01, which means they are extremely vulnerable to changes in the distribution of predicted probabilities of future observations. Random Forest is robust to changes in data, and the training process can be expedited with parallel computing.  Further, it has lower variance compared to the two, indicated by high AUC ROC score. Visualize its metrics.
+
+![]
