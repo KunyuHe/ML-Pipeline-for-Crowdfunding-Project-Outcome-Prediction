@@ -236,6 +236,8 @@ With 10-fold cross validation by default, the classifier would return a predicte
 
 After finding the best set of hyper-parameters of a specific model according to a specific metrics on the training set, the so far "best" model would be validated on the test set. Performances of all the "best" models on any of the three test sets would be recorded in `CSV` format under `../log/evaluations/` directory. There are three folders under the directory, each stores the `performances.csv` table recording performance metrics listed above. Take `test set 1`, which spans Aug. 2012 - Jan. 2013 as an example.
 
+
+
 ##### Accuracy
 
 In terms of accuracy, the best models on `test set 1` are listed below:
@@ -257,6 +259,8 @@ The two models have the same accuracy. It means they can correctly labels projec
 
 Both models beat the baseline, which is the fraction of fully funded projects with a collecting time less than 60 days in the test set, 74.2%. This actually means that on a sample that is large enough, **these models are not much better than randomly guessing** in terms of accuracy. This is disappointing.
 
+However, the bright side of these models are that they both beat the benchmark in terms of precision across proportions of population nearly all the time. **This means that as long as our resources are limited, these models can help identify the projects that are at risk of failing to get fully funded within 60 days of posting with higher precision.**
+
 
 
 **Precision**
@@ -273,3 +277,40 @@ Both models beat the baseline, which is the fraction of fully funded projects wi
 ![](http://www.sciweavers.org/upload/Tex2Img_1557359319/eqn.png)
 
 Precision measures that among all the projects that we predicted would get fully funded within 60 days of posting, the fraction of those who actually meets the criterion. Hence, as we raise the decision threshold and become really selective to label any observation as `"positive"`, we would get high precision as we might only categorize one or two to be `"positive"`. **In practice, both models are useless, unless we can only help one or two crowdfunding projects** so no further analysis is needed.
+
+
+
+**Recall**
+
+![](http://www.sciweavers.org/upload/Tex2Img_1557361824/eqn.png)
+
+Recall measures that among all the projects that actually got fully funded within 60 days of posting, the fraction of those that our model predicts to get fully funded. This measures the ability of our model to cover all the `"positive"` observations.
+
+For recall, the story is the same. As long as we **do not have unlimited resources to help all the crowdfunding projects posted**, which is obviously the case in practice, **models with high recall, even whose recall is 1, is useless**.
+
+
+
+**F-1 Score**
+
+
+
+
+
+**AUC ROC**
+
+
+
+#### 6.3.2 Precision at Proportion of Population
+
+As stated above, in practice we cannot intervene with all the posted projects and help them succeed within 60 days. As long as our resources are limited, we always need to find out the projects that are at highest risks to fail with high precision. This makes a lot of models useful again, even including those who can not beat a random guess model on a infinitely large sample.
+
+So, for example, if I were to make recommendations to someone who's working on this model to identify 5% of posted projects that are at highest risk, I would consider the following models *(there are many models with precision equals to 1 at 5% and here I only keep the ones with either highest AUC ROC, F-1 score or accuracy)*:
+
+| Model         | Threshold | Hyperparameters      | Default Parameters                                           | Accuracy | Precision | Recall   | F1 Score | AUC ROC Score | p_at_0.01 | p_at_0.02 | p_at_0.05 |
+| ------------- | --------- | -------------------- | ------------------------------------------------------------ | -------- | --------- | -------- | -------- | ------------- | --------- | --------- | --------- |
+| Random Forest | 0.7       | {'max_features': 15} | {'n_estimators': 1000, 'oob_score': True,   'n_jobs': -1, 'random_state': 123} | 0.5762   | 0.833146  | 0.536234 | 0.652501 | 0.613638      | 1         | 1         | 1         |
+|               |           |                      |                                                              |          |           |          |          |               |           |           |           |
+|               |           |                      |                                                              |          |           |          |          |               |           |           |           |
+
+
+
