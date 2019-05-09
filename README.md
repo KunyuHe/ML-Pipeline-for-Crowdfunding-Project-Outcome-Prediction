@@ -207,11 +207,11 @@ For the training and evaluation part, I built the benchmark with a default *scik
 
 | Metrics                                  | 2012.02 - 2012.07 | 2012.08 - 2013.01 | 2013.02 - 2013.07 |
 | ---------------------------------------- | ----------------- | ----------------- | ----------------- |
-| Accracy                                  | 0.6012            | 0.6166            |                   |
-| Precision *( at decision threshold 0.5)* | 0.7031            | 0.7660            |                   |
-| Recall *( at decision threshold 0.5)*    | 0.7170            | 0.6960            |                   |
-| F-1 Score *( at decision threshold 0.5)* | 0.7100            | 0.7293            |                   |
-| AUC ROC                                  | 0.5355            | 0.5241            |                   |
+| Accracy                                  | 0.6012            | 0.6166            | 0.6105            |
+| Precision *( at decision threshold 0.5)* | 0.7031            | 0.7660            | 0.7104            |
+| Recall *( at decision threshold 0.5)*    | 0.7170            | 0.6960            | 0.7213            |
+| F-1 Score *( at decision threshold 0.5)* | 0.7100            | 0.7293            | 0.7518            |
+| AUC ROC                                  | 0.5355            | 0.5241            | 0.5482            |
 
 *(Benchmark Test Performances Across Test Periods)*
 
@@ -293,6 +293,8 @@ For recall, the story is the same. As long as we **do not have unlimited resourc
 
 ## 7. Policy Recommendation
 
+### 7.1 Recommended Model
+
 As stated above, in practice we cannot intervene with all the posted projects and help them succeed within 60 days. As long as our resources are limited, we always need to find out the projects that are at highest risks to fail with high precision. This makes a lot of models useful again, even including those who can not beat a random guess model on a infinitely large sample.
 
 So, for example, if I were to make recommendations to someone who's working on this model to identify 5% of posted projects that are at highest risk, I would consider the following models *(there are many models with precision equals to 1 at 5% and here I only keep the ones with either highest AUC ROC, F-1 score or accuracy)*:
@@ -309,17 +311,42 @@ So, for example, if I were to make recommendations to someone who's working on t
 
 Three models all have perfect precision at 5%, which means they can perfectly detect the 5% of posted projects that are at highest risk to fail to get fully funded in 60 days. However, among these models I would recommend Random Forest. Both Boosting and Logistic Regression use a decision threshold of 0.01, which means they are extremely vulnerable to changes in the distribution of predicted probabilities of future observations. Random Forest is robust to changes in data, and the training process can be expedited with parallel computing.  Further, it has lower variance compared to the two, indicated by high AUC ROC score. Visualize its metrics.
 
+
+
+### 7.2 Recommended Model Performances on Test Set One
+
 ![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/dt(Random%20Forest%20--%20AUC%20ROC%20Score).png)
+
+As we can see, distribution of the predicted probabilities are pretty smooth, with a slight left skew.
 
 ![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/pr(Random%20Forest%20--%20AUC%20ROC%20Score).png)
 
+The recommended model always beats the benchmark in terms of precision, which means it's always better than a model that random guesses in terms of efficiency.
+
 ![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/auc(Random%20Forest%20--%20AUC%20ROC%20Score).png)
 
+As expected, the recommended model has decent AUC and an acceptable ROC curve.
+
+![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/fi(Random%20Forest%20--%20AUC%20ROC%20Score).png)
+
+As indicated by the recommended model, the 5 most important features, in descending order, are:
+
+- `total_price_including_optional_support` 
+- `school_latitude`
+- `students_reached`
+- `grade_level`
+- `poverty_level`
 
 
-#### 6.3.3 Test Perfomances over Time
 
-Check test performances of our recommended model over time in `test set 0` and `test set 2`.
+### 7.3 Recommended Model Test Performances
+
+- Input Directory: `../processed_data/
+- Code Script: [recommended_model.py](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/codes/recommended_model.py)
+
+
+
+Check test performances of our recommended model over time in `test set 0` and `test set 2` by running script `recommended_model.py`.
 
 | Type              | Threshold | Default Parameters                                           | Accuracy | Precision | Recall | F1 Score | AUC ROC Score | p_at_0.01 | p_at_0.02 | p_at_0.05 |
 | ----------------- | --------- | ------------------------------------------------------------ | -------- | --------- | ------ | -------- | ------------- | --------- | --------- | --------- |
@@ -334,3 +361,4 @@ Check test performances of our recommended model over time in `test set 0` and `
 We can see that our **recommended model keeps a perfect precision at 5% level across all test sets**. In other words, it can perfectly detect the 5% of posted projects that are at highest risk to fail to get fully funded in 60 days in the past.
 
 In terms of other metrics, we notice that AUC ROC score increases as training set grows larger. This means **our model is robust to change of data, and even benefits from an enlarged training set**.
+

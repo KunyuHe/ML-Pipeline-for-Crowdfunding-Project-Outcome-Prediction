@@ -22,6 +22,7 @@ DEFAULT_ARGS = {'n_estimators': 1000, 'random_state': 123, 'max_features': 15,
                 'oob_score': True, 'n_jobs': -1}
 
 BEST_THRESHOLD = 0.7
+
 BATCH = 0
 
 
