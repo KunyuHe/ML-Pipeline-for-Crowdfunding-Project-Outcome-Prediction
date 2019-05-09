@@ -318,3 +318,7 @@ Three models all have perfect precision at 5%, which means they can perfectly de
 ![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/pr(Random%20Forest%20--%20AUC%20ROC%20Score).png)
 
 ![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/log/images/best-models/auc(Random%20Forest%20--%20AUC%20ROC%20Score).png)
+
+#### 6.3.3 Test Perfomaces over Time
+
+
