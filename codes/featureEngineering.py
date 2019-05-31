@@ -11,8 +11,9 @@ Author:      Kunyu He, CAPP'20, The University of Chicago
 """
 
 import argparse
-import re
 import logging
+import os
+import re
 import time
 import warnings
 
@@ -22,7 +23,6 @@ from sklearn.externals import joblib
 from sklearn.preprocessing import OrdinalEncoder, StandardScaler, MinMaxScaler
 
 from viz import read_data
-from train import create_dirs
 
 #----------------------------------------------------------------------------#
 INPUT_DIR = "../data/"
@@ -119,11 +119,13 @@ def temporal_split(data, var, test_length, gap):
                 len(pairs))
     for i, (train, test) in enumerate(pairs):
         logger.info("<TRAINING-TEST PAIR %s>" % i)
-        logger.info("<TRAINING SET TIME RANGE> ", train[var].min().date(),
-                    "-", train[var].max().date())
-        logger.info("<TEST SET TIME RANGE> ", test[var].min().date(),
-                    "-", test[var].max().date())
+        logger.info("<TRAINING SET TIME RANGE> %s - %s" %
+                    (train[var].min().date(), train[var].max().date()))
+        logger.info("<TEST SET TIME RANGE> %s - %s" %
+                    (test[var].min().date(), test[var].max().date()))
         logger.info("\n")
+
+    return pairs
 
 
 def read_feature_names(dir_path, file_name):
@@ -136,6 +138,18 @@ def read_feature_names(dir_path, file_name):
     """
     with open(dir_path + file_name, 'r') as handle:
         return np.array(handle.readline().split(","))
+
+
+def create_dirs(dir_path):
+    """
+    Create a new directory if it doesn't exist and add a '.gitkeep' file to the
+    directory.
+
+    """
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+        file = open(dir_path + ".gitkeep", "w+")
+        file.close()
 
 
 class FeaturePipeLine:
@@ -187,7 +201,7 @@ class FeaturePipeLine:
 
     TARGET = 'fully_funded'
     TO_DROP = ['projectid', 'teacher_acctid', 'schoolid', 'school_ncesid',
-               'datefullyfunded', 'fully_funded']
+               'datefullyfunded', 'date_posted']
 
     SCALERS = [StandardScaler, MinMaxScaler]
     SCALER_NAMES = ["Standard Scaler", "MinMax Scaler"]
@@ -207,7 +221,7 @@ class FeaturePipeLine:
             - test (bool): whether this is a pipeline built on test data
 
         """
-        logger.info("**" + "-" * 140 + "**")
+        logger.info("#" + "-" * 130 + "#")
         logger.info("<BATCH %s> Creating the preprocessing pipeline for '%s'." %
                     (batch, file_name))
         self.batch = batch
@@ -226,13 +240,15 @@ class FeaturePipeLine:
                          "using %s.") % (self.batch,
                                          self.SCALER_NAMES[self.scaler_index]))
         else:
-            dir_path = INPUT_DIR + self.batch + "/"
+            dir_path = INPUT_DIR + str(self.batch) + "/"
             self.scaler = joblib.load(dir_path + 'fitted_scaler.pkl')
             logger.info("<BATCH %s: Test data preprocessing> Pre-fitted scaler"
                         "loaded.")
 
         self.X = None
         self.y = None
+
+        self.extra_one_hot = []
 
     def con_fill_na(self):
         """
@@ -303,8 +319,8 @@ class FeaturePipeLine:
                 logger.info(info % (var, bins,
                                     ['differently', 'equally'][int(qcut)]))
 
-            if bins > 2:
-                self.TO_ONE_HOT.append(var)
+            if bins > 2 and var not in self.extra_one_hot:
+                self.extra_one_hot.append(var)
 
         return self
 
@@ -370,7 +386,8 @@ class FeaturePipeLine:
             for extract in datetime_extract:
                 new_col = var + "_" + extract
                 self.data[new_col] = to_extract[extract]
-                self.TO_ONE_HOT.append(new_col)
+                if new_col not in self.extra_one_hot:
+                    self.extra_one_hot.append(new_col)
                 if self.verbose:
                     logger.info("\tExtracted %s from '%s' into '%s'." %
                                 (extract, var, new_col))
@@ -387,7 +404,7 @@ class FeaturePipeLine:
         logger.info(("\n\nFinished applying one-hot-encoding to the following "
                      "categorical variables: %s\n\n") % self.TO_ONE_HOT)
 
-        for var in self.TO_ONE_HOT:
+        for var in self.TO_ONE_HOT + self.extra_one_hot:
             dummies = pd.get_dummies(self.data[var], prefix=var)
             self.data.drop(var, axis=1, inplace=True)
             self.data = pd.concat([self.data, dummies], axis=1)
@@ -413,7 +430,7 @@ class FeaturePipeLine:
         logger.info("Finished extracting the features (X).")
 
         file_name = [TRAIN_FEATURES_FILE, TEST_FEATURES_FILE][int(self.test)]
-        dir_path = OUTPUT_DIR + self.batch + "/"
+        dir_path = OUTPUT_DIR + str(self.batch) + "/"
         create_dirs(dir_path)
 
         with open(dir_path + file_name, 'w') as file:
@@ -430,9 +447,9 @@ class FeaturePipeLine:
         test set but are not in the training set, drop them from the test set.
 
         """
-        train_features = read_feature_names(OUTPUT_DIR + self.batch + "/",
+        train_features = read_feature_names(OUTPUT_DIR + str(self.batch) + "/",
                                             'train_features.txt')
-        test_features = read_feature_names(OUTPUT_DIR + self.batch + "/",
+        test_features = read_feature_names(OUTPUT_DIR + str(self.batch) + "/",
                                            'test_features.txt')
 
         to_drop = [var for var in test_features if var not in train_features]
@@ -464,7 +481,7 @@ class FeaturePipeLine:
 
         if not self.test:
             self.scaler.fit(self.X.values.astype(float))
-            dir_path = INPUT_DIR + self.batch + "/"
+            dir_path = INPUT_DIR + str(self.batch) + "/"
             create_dirs(dir_path)
             joblib.dump(self.scaler, dir_path + 'fitted_scaler.pkl')
             logger.info(("<Training data preprocessing> Fitted scaler dumped "
@@ -483,7 +500,7 @@ class FeaturePipeLine:
 
         """
         extension = ["_train.npy", "_test.npy"][int(self.test)]
-        dir_path = OUTPUT_DIR + self.batch + "/"
+        dir_path = OUTPUT_DIR + str(self.batch) + "/"
         create_dirs(dir_path)
 
         np.save(dir_path + "X" + extension, self.X, allow_pickle=False)
@@ -509,7 +526,7 @@ class FeaturePipeLine:
 
         logger.info("\n\n<BATCH %s: Finished processing %s data>" %
                     (self.batch, ["training", "test"][int(self.test)]))
-        logger.info("#" + "-" * 110 + "#\n\n")
+        logger.info("#" + "-" * 130 + "#\n\n")
 
 
 #----------------------------------------------------------------------------#
@@ -535,6 +552,7 @@ if __name__ == "__main__":
     args_dict = {'ask_user': bool(args.ask_user),
                  'verbose': bool(args.verbose)}
 
+    logger.info("**" + "-" * 180 + "**")
     data = read_data(DATA_FILE)
     pairs = temporal_split(data, 'date_posted', "4M", "60D")
 
@@ -544,3 +562,5 @@ if __name__ == "__main__":
 
         test_pipeline = FeaturePipeLine(i, test, **args_dict, test=True)
         test_pipeline.preprocess()
+
+    logger.info("**" + "-" * 180 + "**")

@@ -30,7 +30,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-from featureEngineering import ask, read_feature_names
+from featureEngineering import ask, read_feature_names, create_dirs
 from trainviz import (plot_predicted_scores, plot_precision_recall,
                       plot_auc_roc, plot_feature_importances)
 
@@ -79,18 +79,6 @@ def load_features(labeled_test=False):
         y_test = None
 
     return X_train, X_test, y_train, y_test
-
-
-def create_dirs(dir_path):
-    """
-    Create a new directory if it doesn't exist and add a '.gitkeep' file to the
-    directory.
-
-    """
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-        file = open(dir_path + ".gitkeep", "w+")
-        file.close()
 
 
 def start_clean():
