@@ -242,7 +242,7 @@ class FeaturePipeLine:
         else:
             dir_path = INPUT_DIR + str(self.batch) + "/"
             self.scaler = joblib.load(dir_path + 'fitted_scaler.pkl')
-            logger.info("<BATCH %s: Test data preprocessing> Pre-fitted scaler"
+            logger.info("<BATCH %s: Test data preprocessing> Pre-fitted scaler "
                         "loaded.")
 
         self.X = None
@@ -418,11 +418,10 @@ class FeaturePipeLine:
         Write columns names to "feature_names.txt" in the output directory.
 
         """
-        if not self.test:
-            self.data.dropna(axis=0, subset=[self.TARGET], inplace=True)
-            self.y = self.data[self.TARGET]
-            self.data.drop(self.TARGET, axis=1, inplace=True)
-            logger.info("Finished extracting the target (y).")
+        self.data.dropna(axis=0, subset=[self.TARGET], inplace=True)
+        self.y = self.data[self.TARGET]
+        self.data.drop(self.TARGET, axis=1, inplace=True)
+        logger.info("Finished extracting the target (y).")
 
         self.data.drop(self.TO_DROP, axis=1, inplace=True)
         self.data.dropna(axis=0, inplace=True)
@@ -504,9 +503,8 @@ class FeaturePipeLine:
         create_dirs(dir_path)
 
         np.save(dir_path + "X" + extension, self.X, allow_pickle=False)
-        if not self.test:
-            np.save(dir_path + "y" + extension, self.y.values.astype(float),
-                    allow_pickle=False)
+        np.save(dir_path + "y" + extension, self.y.values.astype(float),
+                allow_pickle=False)
 
         logger.info(("\n\nSaved the resulting NumPy matrices to directory '%s'. "
                      "Features are in 'X%s' and target is in 'y%s'.") %
