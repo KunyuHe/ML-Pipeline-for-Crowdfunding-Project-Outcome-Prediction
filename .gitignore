@@ -6,7 +6,7 @@
 
 # Cache Files
 __pycache__/
-.idea/
+**/.idea/
 
 # Log Files
 *.log
