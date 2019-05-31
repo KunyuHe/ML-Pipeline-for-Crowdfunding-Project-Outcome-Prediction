@@ -17,8 +17,6 @@ from matplotlib.font_manager import FontProperties
 
 INPUT_DIR = "../data/"
 
-DATA_FILE = "projects.csv"
-
 COLORS = list(sns.color_palette("Set2")) + list(sns.color_palette("Set3"))
 TITLE = FontProperties(family='serif', size=14, weight="semibold")
 AXIS = FontProperties(family='serif', size=12)
@@ -26,7 +24,7 @@ TICKS = FontProperties(family='serif', size=10)
 
 
 #----------------------------------------------------------------------------#
-def read_data(drop_na=False):
+def read_data(file_name, drop_na=False):
     """
     Read credit data in the .csv file and data types from the .json file.
 
@@ -36,8 +34,9 @@ def read_data(drop_na=False):
 
     Returns:
         (DataFrame) clean data set with correct data types
+
     """
-    data = pd.read_csv(INPUT_DIR + DATA_FILE)
+    data = pd.read_csv(INPUT_DIR + file_name)
 
     if drop_na:
         data.dropna(axis=0, inplace=True)

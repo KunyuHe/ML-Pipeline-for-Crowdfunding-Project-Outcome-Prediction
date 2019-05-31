@@ -1,425 +1,546 @@
 """
-Summary:     A collections of functions to generate features.
+Title:       Build a preprocessing pipeline that helps user preprocess training
+             and test data from the corresponding CSV input files.
 
-Description:
-Author:      Kunyu He, CAPP'20
+Description: Fill in missing values, discretize continuous variables, generate
+             new features, deal with categorical variables with multiple levels,
+             scale data, and save preprocessed data.
+
+Author:      Kunyu He, CAPP'20, The University of Chicago
+
 """
 
-import os
-import pickle
-import pandas as pd
+import argparse
+import re
+import logging
+import time
+import warnings
+
 import numpy as np
-
+import pandas as pd
+from sklearn.externals import joblib
 from sklearn.preprocessing import OrdinalEncoder, StandardScaler, MinMaxScaler
+
 from viz import read_data
+from train import create_dirs
 
-
-pd.set_option('mode.chained_assignment', None)
-
+#----------------------------------------------------------------------------#
 INPUT_DIR = "../data/"
 OUTPUT_DIR = "../processed_data/"
+LOG_DIR = "../logs/featureEngineering/"
 
 DATA_FILE = "projects.csv"
+TRAIN_FEATURES_FILE = 'train_features.txt'
+TEST_FEATURES_FILE = 'test_features.txt'
 
-MAX_OUTLIERS = {'students_reached': 3,
-                'total_price_including_optional_support': 1}
+# logging
+logger= logging.getLogger('featureEngineering')
+logger.setLevel(logging.INFO)
+ch = logging.StreamHandler()
+logger.addHandler(ch)
+fh = logging.FileHandler(LOG_DIR + time.strftime("%Y%m%d-%H%M%S") + '.log')
+logger.addHandler(fh)
 
-TO_FILL_NA = {'primary_focus_subject': "Other",
-              'primary_focus_area': "Other",
-              'secondary_focus_subject': "None",
-              'secondary_focus_area': "None",
-              'resource_type': "Other"}
-
-TO_COMBINE = {'teacher_prefix': {'female': ['Mrs.', 'Ms.'],
-                                 'male': ['Mr.', 'Dr.']},
-              'resource_type': {'Other': ["Trips", "Visitors"]}}
-
-TO_BINARIES = {'school_charter': 'auto',
-               'school_magnet': 'auto',
-               'poverty_level': [['highest poverty', 'high poverty',
-                                  'moderate poverty', 'low poverty']],
-               'grade_level': [['Grades PreK-2', 'Grades 3-5',
-                                'Grades 6-8', 'Grades 9-12']],
-               'eligible_double_your_impact_match': 'auto',
-               'teacher_prefix': [['male', 'female']],
-               'secondary_focus_area': [["None", "Yes"]],
-               'secondary_focus_subject': [["None", "Yes"]]}
-
-TO_EXTRACT_DATE_TIME = {'date_posted': ["month"]}
-
-TO_ONE_HOT = ['primary_focus_subject', 'primary_focus_area', 'resource_type']
-
-TARGET = 'fully_funded'
-TO_DROP = ['projectid', 'teacher_acctid', 'schoolid', 'school_ncesid',
-           'school_city', 'school_state', 'school_district', 'school_county',
-           'datefullyfunded', 'school_metro', 'fully_funded']
-
-TO_DESCRETIZE = {'school_longitude': 5}
-RIGHT_INCLUSIVE = {'school_longitude': True}
-
-SCALERS = [StandardScaler, MinMaxScaler]
+pd.set_option('mode.chained_assignment', None)
+warnings.filterwarnings("ignore")
 
 
 #----------------------------------------------------------------------------#
-def drop_max_outliers(data, drop_vars):
+def ask(names, message):
     """
-    Takes a data set and a dictionary mapping names of variables whose large
-    extremes need to be dropped to number of outliers to drop, drops those
-    values.
+    Ask user for their choice of index for model or metrics.
 
     Inputs:
-        - data (DataFrame): data matrix to modify.
-        - drop_vars {string: int}: mapping names of variables to number of
-            large outliers to drop.
+        - name (list of strings): name of choices
+        - message (str): type of index to request from user
 
     Returns:
-        (DataFrame) the modified data set.
-
+        (int) index for either model or metrics
     """
-    for col_name, n in drop_vars.items():
-        data.drop(data.nlargest(n, col_name, keep='all').index,
-                  axis=0, inplace=True)
+    indices = []
 
-    return data
+    print("\nUp till now we support:")
+    for i, name in enumerate(names):
+        print("%s. %s" % (i + 1, name))
+        indices.append(str(i + 1))
 
+    index = input("Please input a %s index:\n" % message)
 
-def fill_na(data, to_fill):
-    """
-    """
-    for var, fill in to_fill.items():
-        data[var].fillna(value=fill, inplace=True)
-        print("\tFilled missing values in '{}' with '{}'.".format(\
-              var, fill))
-
-        if fill == "None":
-            TO_COMBINE[var] = {"Yes": [col for col in list(data[var].unique())
-                                       if col != "None"]}
-
-    return data
-
-
-def to_combine(data, to_combine_vars):
-    """
-    """
-    for var, dict_combine in to_combine_vars.items():
-        print("\tCombinations of levels on '{}':".format(var))
-        for combined, lst_combine in dict_combine.items():
-            data.loc[data[var].isin(lst_combine), var] = combined
-
-    return data
-
-
-def to_binary(data, to_bin_vars):
-    """
-    Takes a data set and a dict of variables that needed to be trasformed to
-    binaries, performs the transformations and returns the modified data set.
-
-    Inputs:
-        - data (DataFrame): data matrix to modify.
-        - to_bin_vars ({string: string/[[]]}): mapping names of variables that
-            needed to be trasformed to binaries to 'auto' or unique levels.
-
-    Returns:
-        (DataFrame): the modified data matrix.
-
-    """
-    for var, cats in to_bin_vars.items():
-        enc = OrdinalEncoder(categories=cats)
-        data[var] = enc.fit_transform(np.array(data[var]).reshape(-1, 1))
-
-    return data
-
-
-def extract_date(data, to_extract):
-    """
-    """
-    for var, lst_extract in to_extract.items():
-        can_extract = {"year": data[var].dt.year, "month": data[var].dt.month,
-                       "weekday": data[var].dt.weekday, "day": data[var].dt.day}
-
-        for extract in lst_extract:
-            new_col = var + "_" + extract
-            data[new_col] = can_extract[extract]
-            TO_ONE_HOT.append(new_col)
-            print("\tExtracted {} from '{}' into '{}'.".format(extract, var,
-                                                               new_col))
-
-    return data
-
-
-def one_hot(data, cat_vars):
-    """
-    Takes a data set and a list of categorical variables, creates binary/dummy
-    variables from them, drops the original and inserts the dummies back to the
-    data set.
-
-    Inputs:
-        - data (DataFrame): data matrix to modify.
-        - cat_vars (list of strings): categorical variables to apply one-hot
-            encoding.
-
-    Returns:
-        (DataFrame): the modified data matrix.
-
-    """
-    for var in cat_vars:
-        dummies = pd.get_dummies(data[var], prefix=var)
-        data.drop(var, axis=1, inplace=True)
-        data = pd.concat([data, dummies], axis=1)
-
-    return data
-
-
-def time_train_test_split(data, colname, freq=None):
-    """
-    Creates temporal train/test splits. This function is adapted from
-    https://github.com/rayidghani/magicloops.
-
-    Inputs:
-        data: (DataFrame) the data used for split
-        time_colname: (string) the name of the column indicating time
-        freq (string): the time gap for the testing, and it should be
-            specified as '1M', '3M', etc.
-    Returns:
-        lst_train: (list) list of DataFrames used for training
-        lst_test: (list) list of DataFrames used for testing
-        lst_gap: (list )list of startpoints used for split
-    """
-    lst_gap = []
-    lst_train = []
-    lst_test = []
-    lst_starts = pd.date_range(start=data[colname].min(),
-                               end=data[colname].max(),
-                               freq=freq)
-
-    for i, start in enumerate(lst_starts[:-1]):
-        cut = start + pd.DateOffset(1)
-        train = data.loc[data[colname] <= start].drop(colname, axis=1)
-        test = data.loc[(data[colname] > cut) &
-                        (data[colname] < lst_starts[i + 1])]\
-                   .drop(colname, axis=1)
-
-        lst_train.append(train)
-        lst_test.append(test)
-        lst_gap.append(start)
-
-    return lst_train, lst_test, lst_gap
-
-
-def ask():
-    """
-    """
-    scaler_index = int(input(("Up till now we support:\n"
-                              "\t1. StandardScaler\n"
-                              "\t2. MinMaxScaler\n"
-                              "Please input a scaler index (1 or 2):\n")))
-
-    imputer_index = int(input(("\nUp till now we support:\n"
-                               "\t1. Imputing with column mean\n"
-                               "\t2. Imputing with column median\n"
-                               "Please input the index (1 or 2) of your"
-                               " imputation method:\n")))
-
-    return imputer_index, scaler_index
-
-
-def split(data):
-    """
-    Drop rows with missing labels, split the features and targert.
-
-    Inputs:
-        - data (DataFrame): the data matrix.
-
-    Outputs:
-        (X_train, X_test, y_train, y_test)
-
-    """
-    data.dropna(axis=0, subset=[TARGET], inplace=True)
-    y = data[TARGET]
-    data.drop(TO_DROP, axis=1, inplace=True)
-    X = data
-
-    return X, y
-
-
-def impute(X_train, X_test, imputer_index):
-    """
-    Take the data matrix, and impute the missing features with a customized
-    column feature, then set the data types as preferred from the data
-    dictionary.
-
-    Inputs:
-        - X_train (arry): training features.
-        - X_test (array): testing features.
-        - data_types (dict): mapping column name
-        - ask (bool): whether to ask for imputer index from the user.
-
-    Returns:
-        (DataFrame, DataFrame) the modified training features and test
-            features.
-
-    """
-    if imputer_index == 1:
-        X_train = X_train.fillna(X_train.mean())
-        X_test = X_test.fillna(X_test.mean())
+    if index in indices:
+        return int(index) - 1
     else:
-        X_train = X_train.fillna(X_train.median())
-        X_test = X_test.fillna(X_test.median())
-
-    return X_train, X_test
+        print("Input wrong. Type one in {} and hit Enter.".format(indices))
+        return ask(names, message)
 
 
-def discretize(X_train, X_test):
+def temporal_split(data, var, test_length, gap):
     """
-    Discretizes a continuous variable into a specific number of bins.
+    Split the data into several train and test pairs with fixed-length test sets
+    and variant-length training set. Training sets are all the observations up
+    till the test sets plus gap (to give the results enough time to show up).
+    The first training set is of the same length as the test sets.
 
     Inputs:
-        - X_train (arry): training features.
-        - X_test (array): testing features.
-        - cont_vars ({string: int}): mapping column names to number of bins to
-            cut the columns in.
-        - right_inclusive ({string: bool}): mapping column names to whether to
-            cut the series into right inclusive of not.
+        - data (DataFrame) data matrix to be split it to training and test sets
+        - var (string): split in terms of the column
+        - test_length (string): length of the test set (e.x. 6M, 10D)
+        - gap (string): length of the gap between training and test set, and
+            after test set until the end
 
     Returns:
-        (DataFrame) the modified data set.
+        (list of tuples of DataFrames) each tuple is a training and test pair
 
     """
-    for col_name, n in TO_DESCRETIZE.items():
-        X_train[col_name] = pd.cut(X_train[col_name], n,
-                                   right=RIGHT_INCLUSIVE[col_name]).cat.codes
-        X_test[col_name] = pd.cut(X_test[col_name], n,
-                                  right=RIGHT_INCLUSIVE[col_name]).cat.codes
-        print("\tDiscretized '{}' into {} bins.".format(col_name, n))
+    gap_delta = pd.Timedelta(int(re.findall(r'[0-9]+', gap)[0]),
+                             re.findall(r'[a-zA-Z]+', gap)[0])
+    test_delta = pd.Timedelta(int(re.findall(r'[0-9]+', test_length)[0]),
+                              re.findall(r'[a-zA-Z]+', test_length)[0])
+    pairs = []
 
-    return X_train, X_test
+    training_end = (data[var].min() + test_delta).date()
+    test_start = training_end + gap_delta
+    test_end = test_start + test_delta
+    max_date = data[var].max().date() - gap_delta
+
+    while test_end <= max_date:
+        pairs.append((data[data[var] < training_end],
+                      data[(data[var] >= test_start) & (data[var] < test_end)]))
+
+        test_start = test_end
+        test_end += test_delta
+        training_end = test_start - gap_delta
+
+    logger.info(("Using a test length of '%s', with a '%s' gap between "
+                 "training and test sets, and at the end of the data set "
+                 "observations of the last '%s' cannot be used for either "
+                 "training or testing.") % (test_length, gap, gap))
+    logger.info(("Print the start and end date for each of the %s pairs of "
+                 "training and test sets to verify the split works.\n") %
+                len(pairs))
+    for i, (train, test) in enumerate(pairs):
+        logger.info("<TRAINING-TEST PAIR %s>" % i)
+        logger.info("<TRAINING SET TIME RANGE> ", train[var].min().date(),
+                    "-", train[var].max().date())
+        logger.info("<TEST SET TIME RANGE> ", test[var].min().date(),
+                    "-", test[var].max().date())
+        logger.info("\n")
 
 
-def scale(X_train, X_test, scaler_index):
+def read_feature_names(dir_path, file_name):
     """
-    Asks user for the scaler to use, or uses default standard scaler. Fits it
-    on the training data and scales the test data with it if test data is
-    provided.
-
-    Inputs:
-        - X_train (arry): training features.
-        - X_test (array): testing features.
+    Read .txt files with only one line as feature names separated by ",". Save
+    the output to a list of feature names.
 
     Returns:
-        (array, array): train and test data after scaling.
+        (list of strings) list of feature names.
+    """
+    with open(dir_path + file_name, 'r') as handle:
+        return np.array(handle.readline().split(","))
+
+
+class FeaturePipeLine:
+    """
+    Preprocess pipeline for a data set from CSV file. Modify the class
+    variables to fill in missing values, combine multinomial variables to ones
+    with less levels and binaries, and apply one-hot-encoding. Then split data
+    into features and target, drop rows with missing labels and some columns.
+    At last, apply scaling.
 
     """
-    with open(OUTPUT_DIR + 'col_names.pickle', 'wb') as handle:
-        pickle.dump(X_train.columns, handle)
+    TO_FILL_CON = {'students_reached'}
 
-    scaler = SCALERS[scaler_index - 1]()
-    X_train = scaler.fit_transform(X_train.values.astype(float))
-    X_test = scaler.transform(X_test.values.astype(float))
+    TO_FILL_OBJ = {'school_metro': None,
+                   'school_district': "MISC",
+                   'primary_focus_subject': "Other",
+                   'primary_focus_area': "Other",
+                   'secondary_focus_subject': "MISC",
+                   'secondary_focus_area': "MISC",
+                   'resource_type': None}
 
-    return X_train, X_test
+    TO_DISCRETIZE = {'total_price_including_optional_support': (True, 5, 0),
+                     'students_reached': (True, 5, 0),
+                     'school_longitude': (False, 8, 3),
+                     'school_latitude': (False, 3, 3)}
+
+    TO_COMBINE = {'teacher_prefix': {"Mr.": ["Dr."]},
+                  'school_city': {"MISC": None},
+                  'school_state': {"MISC": None},
+                  'school_district': {"MISC": None},
+                  'school_county': {"MISC": None},
+                  'primary_focus_subject': {"Other": None},
+                  'primary_focus_area': {"Other": None},
+                  'secondary_focus_subject': {"Other": None},
+                  'secondary_focus_area': {"Other": None},
+                  'resource_type': {"Other": None}}
+
+    TO_BINARIES = {'school_charter': 'auto',
+                   'school_magnet': 'auto',
+                   'eligible_double_your_impact_match': 'auto'}
+
+    TO_EXTRACT_DATE_TIME = {'date_posted': ["year", "month"]}
+
+    TO_ONE_HOT = ['school_city', 'school_state', 'school_district',
+                  'school_county', 'school_metro', 'teacher_prefix',
+                  'primary_focus_subject', 'primary_focus_area',
+                  'secondary_focus_subject', 'secondary_focus_area',
+                  'resource_type', 'poverty_level', 'grade_level']
+
+    TARGET = 'fully_funded'
+    TO_DROP = ['projectid', 'teacher_acctid', 'schoolid', 'school_ncesid',
+               'datefullyfunded', 'fully_funded']
+
+    SCALERS = [StandardScaler, MinMaxScaler]
+    SCALER_NAMES = ["Standard Scaler", "MinMax Scaler"]
 
 
-def save_data(X_train, X_test, y_train, y_test, i):
-    """
-    Saves traning and testing data as numpy arrays in the output directory.
+    def __init__(self, batch, data, file_name=DATA_FILE, ask_user=True,
+                 verbose=True, test=False):
+        """
+        Construct a preprocessing pipeline given name of the data file.
 
-    Inputs:
-        - X_train (array): training features.
-        - X_test (array): testing features.
-        - y_train (array): training target.
-        - y_test (array): testing target.
+        Inputs:
+            - file_name (string): name of the data file
+            - ask_user (bool): whether to ask user for configuration
+            - verbose (bool): whether to make extended printing in
+                preprocessing
+            - drop_na (bool): whether to drop rows with missing values
+            - test (bool): whether this is a pipeline built on test data
 
-    Returns:
-        None
+        """
+        logger.info("**" + "-" * 140 + "**")
+        logger.info("<BATCH %s> Creating the preprocessing pipeline for '%s'." %
+                    (batch, file_name))
+        self.batch = batch
+        self.data = data
+        self.verbose = verbose
+        self.test = test
+        logger.info("\tFinished reading cleaned data.\n")
 
-    """
-    if "processed_data" not in os.listdir("../"):
-        os.mkdir("processed_data")
+        if not self.test:
+            if ask_user:
+                self.scaler_index = ask(self.SCALER_NAMES, "scaler")
+            else:
+                self.scaler_index = 0
+            self.scaler = self.SCALERS[self.scaler_index]()
+            logger.info(("<BATCH %s: Training data preprocessing> Pipeline "
+                         "using %s.") % (self.batch,
+                                         self.SCALER_NAMES[self.scaler_index]))
+        else:
+            dir_path = INPUT_DIR + self.batch + "/"
+            self.scaler = joblib.load(dir_path + 'fitted_scaler.pkl')
+            logger.info("<BATCH %s: Test data preprocessing> Pre-fitted scaler"
+                        "loaded.")
 
-    np.savez(OUTPUT_DIR + 'X{}.npz'.format(i), train=X_train, test=X_test)
-    np.savez(OUTPUT_DIR + 'y{}.npz'.format(i), train=y_train.values.astype(float),
-                                               test=y_test.values.astype(float))
+        self.X = None
+        self.y = None
 
-    print(("Saved the resulting NumPy matrices to directory {}. Features are"
-           " in 'X{}.npz' and target is in 'y{}.npz'. Column names are saved as"
-           " 'col_names.pickle'.").format(OUTPUT_DIR, i, i))
+    def con_fill_na(self):
+        """
+        Take the continuous variables, impute the missing features with column
+        medians.
 
+        Returns:
+            (self) pipeline with missing values in the numerical columns imputed
 
-def process():
-    """
-    Reads the data set, drops rows with large extremes, converts some
-    variables into binaries, combines some binaries into categoricals or
-    ordinals, and applies one-hot encoding on categoricals. Then splits the
-    data set in to training and test, impute missing values separately, and
-    descretizes some continuous variables into ordinals. Then save the data as
-    NumPy arrays to the output directory.
+        """
+        logger.info("\n\nStart to impute missing values continuous variables:")
 
-    Inputs:
-        - data (DataFrame): data matrix to modify.
+        for var in self.TO_FILL_CON:
+            imputed = self.data[var].median()
+            self.data[var] = self.data[var].fillna(imputed)
 
-    Returns:
-        (DataFrame): the processed data matrix.
+            if self.verbose:
+                logger.info(("\tMissing values in '%s' imputed with column "
+                             " median %4.3f.") % (var, imputed))
 
-    """
-    # load data
-    data = read_data()
-    print("Finished reading cleaned data.\n")
+        return self
 
-    # drop rows with large extremes
-    data = drop_max_outliers(data, MAX_OUTLIERS)
-    print("Finished dropping extreme large values:")
-    for col_name, n in MAX_OUTLIERS.items():
-        print("\tDropped {} observations with extreme large values on '{}'.".\
-              format(n, col_name))
+    def str_fill_na(self):
+        """
+        Fill in missing data with desired string entry.
 
-    # fill in missing values
-    print("\nFinished filling in missing data.")
-    data = fill_na(data, TO_FILL_NA)
+        Returns:
+            (self) pipeline with missing values in the object columns filled.
 
-    # combine levels of some categoricals
-    print("\nFinished combining levels of some categoricals.")
-    data = to_combine(data, TO_COMBINE)
+        """
+        logger.info("\n\nStart to fill in missing values:")
 
-    # convert some variables into binaries
-    data = to_binary(data, TO_BINARIES)
-    print("\nFinished transforming the following variables: {}.\n".\
-          format(list(TO_BINARIES.keys())))
+        for var, fill in self.TO_FILL_OBJ.items():
+            # if no value is provided to fill in, use the most frequent one
+            if fill is None:
+                fill = self.data[var].mode()[0]
+            self.data[var].fillna(value=fill, inplace=True)
 
-    # apply one-hot encoding on categoricals
-    data = one_hot(data, TO_ONE_HOT)
-    print("Finished one-hot encoding the following categorical variables: {}\n".\
-          format(TO_ONE_HOT))
+            if self.verbose:
+                logger.info("\tFilled missing values in '%s' with '%s'." %
+                            (var, fill))
 
-    # split the data into training and test sets
-    trains, tests, _ = time_train_test_split(data, 'date_posted', freq='6M')
-    imputer_index, scaler_index = ask()
+    def discretize(self):
+        """
+        Discretizes continuous variables into multinomials.
 
-    for i, train in enumerate(trains):
-        test = tests[i]
+        Returns:
+            (self) pipeline with some numerical columns discretized.
 
-        X_train, y_train = split(train)
-        X_test, y_test = split(test)
+        """
+        logger.info("\n\nStart to discretize continuous variables:")
 
-        # do imputation to fill in the missing values
-        X_train, X_test = impute(X_train, X_test, imputer_index)
-        print(("\n\n**-------------------------------------------------------------**\n"
-              "Finished imputing missing values with feature {} for window {}.\n").\
-              format(["means", "medians"][imputer_index - 1], i))
+        for var, (qcut, bins, precision) in self.TO_DISCRETIZE.items():
+            if qcut:
+                self.data[var] = pd.qcut(self.data[var], bins,
+                                         precision=precision).cat.codes
+            else:
+                self.data[var] = pd.cut(self.data[var], bins,
+                                        precision=precision).cat.codes
 
-        # discretize some continuous features into ordinals
-        print("Finished discretizing some continuous variables for window {}:".\
-              format(i))
-        X_train, X_test = discretize(X_train, X_test)
+            if self.verbose:
+                if isinstance(bins, list):
+                    bins = len(bins) - 1
 
-        # scale training and test data
-        X_train, X_test = scale(X_train, X_test, scaler_index)
-        print("Finished extracting the target and scaling the features for window {}.\n".\
-              format(i))
+                info = "\tDiscretized '%s' into %s %s-sized buckets."
+                if self.data[var].isnull().sum() > 0:
+                    info += " Here '-1' indicates that the value is missing."
+                logger.info(info % (var, bins,
+                                    ['differently', 'equally'][int(qcut)]))
 
-        save_data(X_train, X_test, y_train, y_test, i)
+            if bins > 2:
+                self.TO_ONE_HOT.append(var)
+
+        return self
+
+    def to_combine(self):
+        """
+        Combine some unnecessary levels of multinomials.
+
+        Returns:
+            (self) pipeline with less frequent levels in the multinomial columns
+                combined.
+
+        """
+        logger.info("\n\nStart to combine unnecessary levels of multinomials.")
+
+        for var, dict_combine in self.TO_COMBINE.items():
+            if not dict_combine:
+                dict_combine = {"YES": [val for val in self.data[var].unique()
+                                        if val != "NO"]}
+
+            for combined, lst_combine in dict_combine.items():
+                if not lst_combine:
+                    freqs = self.data[var].value_counts(normalize=True)
+                    lst_combine = freqs[freqs < 0.05].index
+                self.data.loc[self.data[var].isin(lst_combine), var] = combined
+
+            if self.verbose:
+                logger.info("\tCombinations of levels on '%s'." % var)
+
+        return self
+
+    def to_binary(self):
+        """
+        Transform variables to binaries.
+
+        Returns:
+            (self) pipeline with chosen columns transformed to binaries.
+
+        """
+        logger.info(("\n\nFinished transforming the following variables: %s to "
+                     "binaries.") % (list(self.TO_BINARIES.keys())))
+
+        for var, cats in self.TO_BINARIES.items():
+            enc = OrdinalEncoder(categories=cats)
+            self.data[var] = enc.fit_transform(np.array(self.data[var]).\
+                                               reshape(-1, 1))
+
+        return self
+
+    def extract_date(self):
+        """
+        Extract date information (year, month of year, day of week) from
+        datetime columns.
+
+        """
+        logger.info("\n\nStart to extract time from datetime variables.")
+
+        for var, datetime_extract in self.TO_EXTRACT_DATE_TIME.items():
+            to_extract = {"year": self.data[var].dt.year,
+                          "month": self.data[var].dt.month,
+                          "weekday": self.data[var].dt.weekday,
+                          "day": self.data[var].dt.day}
+
+            for extract in datetime_extract:
+                new_col = var + "_" + extract
+                self.data[new_col] = to_extract[extract]
+                self.TO_ONE_HOT.append(new_col)
+                if self.verbose:
+                    logger.info("\tExtracted %s from '%s' into '%s'." %
+                                (extract, var, new_col))
+
+    def one_hot(self):
+        """
+        Creates binary/dummy variables from multinomials, drops the original
+        and inserts the dummies back.
+
+        Returns:
+            (self) pipeline with one-hot-encoding applied on categorical vars.
+
+        """
+        logger.info(("\n\nFinished applying one-hot-encoding to the following "
+                     "categorical variables: %s\n\n") % self.TO_ONE_HOT)
+
+        for var in self.TO_ONE_HOT:
+            dummies = pd.get_dummies(self.data[var], prefix=var)
+            self.data.drop(var, axis=1, inplace=True)
+            self.data = pd.concat([self.data, dummies], axis=1)
+
+        return self
+
+    def feature_target_split(self):
+        """
+        Drop rows with missing labels, drop some columns that are not relevant
+        or have too many missing values, split the features (X) and target (y)
+        Write columns names to "feature_names.txt" in the output directory.
+
+        """
+        if not self.test:
+            self.data.dropna(axis=0, subset=[self.TARGET], inplace=True)
+            self.y = self.data[self.TARGET]
+            self.data.drop(self.TARGET, axis=1, inplace=True)
+            logger.info("Finished extracting the target (y).")
+
+        self.data.drop(self.TO_DROP, axis=1, inplace=True)
+        self.data.dropna(axis=0, inplace=True)
+        self.X = self.data
+        logger.info("Finished extracting the features (X).")
+
+        file_name = [TRAIN_FEATURES_FILE, TEST_FEATURES_FILE][int(self.test)]
+        dir_path = OUTPUT_DIR + self.batch + "/"
+        create_dirs(dir_path)
+
+        with open(dir_path + file_name, 'w') as file:
+            file.write(",".join(self.X.columns))
+            logger.info("\t%s feature names wrote to '%s' under directory '%s'"
+                        % (["Train", "Test"][int(self.test)], file_name,
+                           dir_path))
+
+    def compare_train_test(self):
+        """
+        Compare the features in the training and test set after preprocessing.
+        For those in the training set but not the test set, insert a column with
+        all zeros at the same column index in the test set. For those in the
+        test set but are not in the training set, drop them from the test set.
+
+        """
+        train_features = read_feature_names(OUTPUT_DIR + self.batch + "/",
+                                            'train_features.txt')
+        test_features = read_feature_names(OUTPUT_DIR + self.batch + "/",
+                                           'test_features.txt')
+
+        to_drop = [var for var in test_features if var not in train_features]
+        self.data.drop(to_drop, axis=1, inplace=True)
+        logger.info(("\n\n%s are in the test set but are not in the training "
+                     "set, dropped from the test set.") % to_drop)
+
+        to_add = [(i, var) for (i, var) in enumerate(train_features)
+                  if var not in test_features]
+        logger.info(("Start to add those are in the training set but not the "
+                     "test set to the test set:"))
+        for i, var in to_add:
+            self.data.insert(loc=i, column=var, value=0)
+            if self.verbose:
+                logger.info("\t'%s' added to the %sth column of the test set "
+                            "with all zeros." % (var, i))
+
+    def scale(self):
+        """
+        Fit and transform the scaler on the training data and return the
+        scaler data to scale test data.
+
+        Returns:
+            (self) pipeline with scaled data. The fitted scaler dumped to
+                "../data/"
+
+        """
+        logger.info("\n")
+
+        if not self.test:
+            self.scaler.fit(self.X.values.astype(float))
+            dir_path = INPUT_DIR + self.batch + "/"
+            create_dirs(dir_path)
+            joblib.dump(self.scaler, dir_path + 'fitted_scaler.pkl')
+            logger.info(("<Training data preprocessing> Fitted scaler dumped "
+                         "to '%s' under directory '%s'.") % ('fitted_scaler.pkl',
+                                                             dir_path))
+
+        self.X = self.scaler.transform(self.X.values.astype(float))
+        logger.info("Finished scaling the feature matrix.")
+
+        return self
+
+    def save_data(self):
+        """
+        Saves the feature matrix and target as numpy arrays in the output
+        directory.
+
+        """
+        extension = ["_train.npy", "_test.npy"][int(self.test)]
+        dir_path = OUTPUT_DIR + self.batch + "/"
+        create_dirs(dir_path)
+
+        np.save(dir_path + "X" + extension, self.X, allow_pickle=False)
+        if not self.test:
+            np.save(dir_path + "y" + extension, self.y.values.astype(float),
+                    allow_pickle=False)
+
+        logger.info(("\n\nSaved the resulting NumPy matrices to directory '%s'. "
+                     "Features are in 'X%s' and target is in 'y%s'.") %
+                     (dir_path, extension, extension))
+
+    def preprocess(self):
+        """
+        Finish preprocessing the data file.
+
+        """
+        self.con_fill_na().str_fill_na()
+        self.discretize().to_combine().to_binary().extract_date()
+        self.one_hot().feature_target_split()
+        if self.test:
+            self.compare_train_test()
+        self.scale().save_data()
+
+        logger.info("\n\n<BATCH %s: Finished processing %s data>" %
+                    (self.batch, ["training", "test"][int(self.test)]))
+        logger.info("#" + "-" * 110 + "#\n\n")
 
 
 #----------------------------------------------------------------------------#
 if __name__ == "__main__":
 
-    process()
+    desc = ("Build a preprocessing pipeline that helps user preprocess "
+            "training and test data from the temporal train test split on the "
+            "donation project data. Fill in missing values, discretize "
+            "continuous variables, generate new features, deal with categorical "
+            "variables with multiple levels, scale data, and save preprocessed "
+            "data.")
+    parser = argparse.ArgumentParser(description=desc)
+
+    parser.add_argument('--ask', dest='ask_user', type=int, default=0,
+                        help=(
+                            "Please specify whether the script should ask for "
+                            "user configuration to run on one model-metrics "
+                            "pair or all of them (1 for true or 0 for false)."))
+    parser.add_argument('--verbose', dest='verbose', type=int, default=1,
+                        help=("Please specify whether the pipeline should be "
+                              "verbose (1 for true or 0 for false)."))
+    args = parser.parse_args()
+    args_dict = {'ask_user': bool(args.ask_user),
+                 'verbose': bool(args.verbose)}
+
+    data = read_data(DATA_FILE)
+    pairs = temporal_split(data, 'date_posted', "4M", "60D")
+
+    for i, (train, test) in enumerate(pairs):
+        training_pipeline = FeaturePipeLine(i, train, **args_dict, test=False)
+        training_pipeline.preprocess()
+
+        test_pipeline = FeaturePipeLine(i, test, **args_dict, test=True)
+        test_pipeline.preprocess()
