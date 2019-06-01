@@ -10,12 +10,15 @@ Author:      Kunyu He, CAPP'20, The University of Chicago
 
 """
 
+import warnings
+
+warnings.filterwarnings("ignore")
+
 import argparse
 import logging
 import os
 import re
 import time
-import warnings
 
 import numpy as np
 import pandas as pd
@@ -118,12 +121,21 @@ def temporal_split(data, var, test_length, gap):
                  "training and test sets to verify the split works.\n") %
                 len(pairs))
     for i, (train, test) in enumerate(pairs):
-        logger.info("<TRAINING-TEST PAIR %s>" % i)
-        logger.info("<TRAINING SET TIME RANGE> %s - %s" %
-                    (train[var].min().date(), train[var].max().date()))
-        logger.info("<TEST SET TIME RANGE> %s - %s" %
-                    (test[var].min().date(), test[var].max().date()))
-        logger.info("\n")
+        messages = ["<TRAINING-TEST PAIR %s>" % i,
+                    "<TRAINING SET TIME RANGE> %s - %s" %
+                    (train[var].min().date(), train[var].max().date()),
+                    "<TEST SET TIME RANGE> %s - %s" %
+                    (test[var].min().date(), test[var].max().date())]
+        dir_path = OUTPUT_DIR + ("Batch %s/" % i)
+        create_dirs(dir_path)
+        with open(dir_path + "time_window.txt", 'w') as file:
+            file.write(",".join(messages))
+
+        for message in messages:
+            logger.info(message)
+        logger.info("\n\n")
+    logger.info("All time windows wrote to sub-directories under %s.\n" %
+                OUTPUT_DIR)
 
     return pairs
 
@@ -429,7 +441,7 @@ class FeaturePipeLine:
         logger.info("Finished extracting the features (X).")
 
         file_name = [TRAIN_FEATURES_FILE, TEST_FEATURES_FILE][int(self.test)]
-        dir_path = OUTPUT_DIR + str(self.batch) + "/"
+        dir_path = OUTPUT_DIR + ("Batch %s/" % self.batch)
         create_dirs(dir_path)
 
         with open(dir_path + file_name, 'w') as file:
@@ -446,9 +458,9 @@ class FeaturePipeLine:
         test set but are not in the training set, drop them from the test set.
 
         """
-        train_features = read_feature_names(OUTPUT_DIR + str(self.batch) + "/",
+        train_features = read_feature_names(OUTPUT_DIR + ("Batch %s/" % self.batch),
                                             'train_features.txt')
-        test_features = read_feature_names(OUTPUT_DIR + str(self.batch) + "/",
+        test_features = read_feature_names(OUTPUT_DIR + ("Batch %s/" % self.batch),
                                            'test_features.txt')
 
         to_drop = [var for var in test_features if var not in train_features]
@@ -480,7 +492,7 @@ class FeaturePipeLine:
 
         if not self.test:
             self.scaler.fit(self.X.values.astype(float))
-            dir_path = INPUT_DIR + str(self.batch) + "/"
+            dir_path = INPUT_DIR + ("Batch %s/" % self.batch)
             create_dirs(dir_path)
             joblib.dump(self.scaler, dir_path + 'fitted_scaler.pkl')
             logger.info(("<Training data preprocessing> Fitted scaler dumped "
@@ -499,7 +511,7 @@ class FeaturePipeLine:
 
         """
         extension = ["_train.npy", "_test.npy"][int(self.test)]
-        dir_path = OUTPUT_DIR + str(self.batch) + "/"
+        dir_path = OUTPUT_DIR + ("Batch %s/" % self.batch)
         create_dirs(dir_path)
 
         np.save(dir_path + "X" + extension, self.X, allow_pickle=False)
