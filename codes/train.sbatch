@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=example_sbatch
-#SBATCH --time=00:05:00
-#SBATCH --partition=broadwl
+#SBATCH --job-name=gbtrain_sbatch
+#SBATCH --time=24:00:00
+#SBATCH --partition=sandyb
 #SBATCH --nodes=16
 #SBATCH --mem-per-cpu=2000
 
