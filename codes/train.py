@@ -155,13 +155,8 @@ class ModelingPipeline:
 
     """
 
-    MODEL_NAMES = ["Logistic Regression", "Decision Tree", "Random Forest",
-                   "Bagging", "Ada Boosting", "Gradient Boosting",
-                   "Extra Tree", "Naive Bayes", "KNN", "Linear SVM"]
-    MODELS = [LogisticRegression, DecisionTreeClassifier,
-              RandomForestClassifier, BaggingClassifier, AdaBoostClassifier,
-              GradientBoostingClassifier, ExtraTreesClassifier, GaussianNB,
-              KNeighborsClassifier, LinearSVC]
+    MODEL_NAMES = ["Gradient Boosting"]
+    MODELS = [GradientBoostingClassifier]
 
     METRICS_NAMES = ["accuracy", "precision", "recall", "f1", "roc_auc"]
     METRICS = [accuracy_score, precision_score, recall_score, f1_score,
@@ -205,7 +200,7 @@ class ModelingPipeline:
         },
 
         "Gradient Boosting": {
-            'learning_rate': [0.001, 0.01, 0.1, 0.5, 1, 10],
+            'learning_rate': [0.001, 0.01, 0.1, 1],
             'subsample': [0.05, 0.1, 0.3, 0.5, 0.7, 1.0],
             'max_depth': [5, 10, 15, 20]
         },
@@ -235,10 +230,10 @@ class ModelingPipeline:
                     "Random Forest": {'n_estimators': 1000,
                                       'random_state': SEED,
                                       'oob_score': True, 'n_jobs': -1},
-                    "Bagging": {'n_estimators': 1000, 'random_state': SEED,
+                    "Bagging": {'n_estimators': 500, 'random_state': SEED,
                                 'oob_score': True, 'n_jobs': -1},
-                    "Ada Boosting": {'n_estimators': 1000, 'random_state': SEED},
-                    "Gradient Boosting": {'n_estimators': 1000,
+                    "Ada Boosting": {'n_estimators': 100, 'random_state': SEED},
+                    "Gradient Boosting": {'n_estimators': 100,
                                           'random_state': SEED},
                     "Extra Tree": {'n_estimators': 1000, 'random_state': SEED,
                                    'n_jobs': -1},

@@ -13,3 +13,6 @@ __pycache__/
 # Notebooks
 *.ipynb
 .ipynb_checkpoints/
+
+# Image
+*.png
