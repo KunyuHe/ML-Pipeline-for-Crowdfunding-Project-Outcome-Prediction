@@ -84,8 +84,7 @@ def load_features(dir_path, labeled_test=False):
     messages = read_feature_names(dir_path, "time_window.txt")
     for message in messages:
         logger.info(message)
-    logger.info("\n\n")
-
+    logger.info("\n")
     return X_train, X_test, y_train, y_test
 
 
@@ -259,7 +258,7 @@ class ModelingPipeline:
             - plot (bool): whether to include plots for visual evaluations
 
         """
-        logger.info("**" + "-" * 160 + "**")
+        logger.info("##" + "-" * 160 + "##")
         self.cv = cv
         self.ask_user = ask_user
         self.plot = plot
@@ -315,8 +314,8 @@ class ModelingPipeline:
             - model_index (int): index of the model for the pipeline
 
         """
-        logger.info("**" + "-" * 160 + "**\n\n")
-        logger.info("**" + "-" * 160 + "**")
+        logger.info("##" + "-" * 160 + "##\n\n")
+        logger.info("##" + "-" * 160 + "##")
 
         # Set model index and model name
         self.model_index = model_index
@@ -484,7 +483,7 @@ class ModelingPipeline:
 
         return predicted_prob
 
-    def find_best_thresholds(self, predicted_prob, thresholds):
+    def find_best_thresholds(self, predicted_prob, thresholds, y_true):
         """
         Make predictions at threshold k, where k is the percentage of
         population at the highest probabilities to be classified as "positive".
@@ -506,7 +505,7 @@ class ModelingPipeline:
 
         for k in thresholds:
             labels = [1 if prob >= k else 0 for prob in predicted_prob]
-            score = self.metrics(self.y_train, labels)
+            score = self.metrics(y_true, labels)
 
             if score >= grid_best_score and score != 0:
                 grid_best_score = score
@@ -549,7 +548,8 @@ class ModelingPipeline:
                 continue
 
             grid_thresholds, score = self.find_best_thresholds(predicted_prob,
-                                                               self.DECISION_THRESHOLDS)
+                                                               self.DECISION_THRESHOLDS,
+                                                               self.y_train)
             if not grid_thresholds:
                 continue
 
@@ -572,7 +572,8 @@ class ModelingPipeline:
 
         logger.info(("<BATCH %s - %s to be optimized on %s> Search Finished. "
                      "The highest cross-validation %s is %4.4f. There are %s "
-                     "best sets.") % (self.model_name,
+                     "best sets.") % (self.batch,
+                                      self.model_name,
                                       self.metrics_name.title(),
                                       self.metrics_name, best_score,
                                       len(best_config)))
@@ -580,7 +581,7 @@ class ModelingPipeline:
 
         return best_config
 
-    def plot_model(self, hyper_params):
+    def plot_model(self, hyper_params, predicted_prob):
         """
         Plot the tuned models in to visually evaluate it in terms of predicted
         probabilities, precision-recall-population thresholds, area under curve,
@@ -594,23 +595,21 @@ class ModelingPipeline:
                    "/" + self.model_name + "/"
         create_dirs(dir_path)
 
-        cv_prob = self.get_predicted_prob(hyper_params)
         title = "%s-%s-%s" % (self.model_name, self.metrics_name.title(),
                               self.hyper_grid_index)
 
-        plot_predicted_scores(cv_prob, dir_path, title)
+        plot_predicted_scores(predicted_prob, dir_path, title)
 
-        plot_precision_recall(self.y_train, cv_prob, self.baseline, dir_path,
-                              title)
+        plot_precision_recall(self.y_test, predicted_prob, self.baseline,
+                              dir_path, title)
 
-        self.clf.set_params(**hyper_params)
-        data = train_test_split(self.X_train, self.y_train, test_size=0.25,
-                                random_state=self.SEED)
+        data = [self.X_train, self.X_test, self.y_train, self.y_test]
         plot_auc_roc(self.clf, *data, dir_path, title)
 
         if hasattr(self.clf, "feature_importances_"):
             importances = self.clf.feature_importances_
-            col_names = read_feature_names(INPUT_DIR, 'train_features.txt')
+            col_names = read_feature_names(INPUT_DIR + ("Batch %s/" % self.batch),
+                                           'train_features.txt')
             plot_feature_importances(importances, col_names, dir_path, top_n=5,
                                      title=title)
 
@@ -621,7 +620,8 @@ class ModelingPipeline:
         """
         if not os.path.isfile(dir_path + file_name):
             cols = ['ModelIndex', 'ModelName', 'HyperGridIndex', 'HyperParams',
-                    'TrainingTime', 'TestTime', 'Threshold'] + self.metrics_name
+                    'TrainingTime (s)', 'TestTime (s)', 'Threshold'] +\
+                   self.METRICS_NAMES
             return pd.DataFrame(columns=cols)
         else:
             return pd.read_csv(dir_path + file_name)
@@ -696,22 +696,23 @@ class ModelingPipeline:
             hyper_params = dict(zip(self.hyper_args, hyper_grid))
             self.clf.set_params(**hyper_params)
 
-            if self.plot:
-                self.plot_model(hyper_params)
-
             tr_time, ts_time, predicted_prob = self.predict()
             if predicted_prob is None:
                 continue
 
-            temp = [self.model_index, self.model_name, self.metrics_index,
-                    self.metrics, tr_time, ts_time]
+            if self.plot:
+                self.plot_model(hyper_params, predicted_prob)
+
+            temp = [self.model_index, self.model_name, self.hyper_grid_index,
+                    hyper_params, tr_time, ts_time]
             test_thresholds, _ = self.find_best_thresholds(predicted_prob,
-                                                           thresholds)
+                                                           thresholds,
+                                                           self.y_test)
             for k in test_thresholds:
                 line = temp[:] + [k]
                 labels = [1 if prob >= k else 0 for prob in predicted_prob]
                 for i, metrics in enumerate(self.METRICS):
-                    if self.metrics_name[i].startswith("Precision at"):
+                    if self.METRICS_NAMES[i].startswith("Precision at"):
                         line.append(metrics(self.y_test, predicted_prob))
                     else:
                         line.append(metrics(self.y_test, labels))

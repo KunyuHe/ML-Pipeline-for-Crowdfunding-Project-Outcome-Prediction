@@ -1,8 +1,6 @@
 # Data Files
 *.tsz
-*.csv
 *.zip
-*.npy
 
 # Cache Files
 __pycache__/
@@ -11,9 +9,6 @@ __pycache__/
 # Log Files
 *.log
 *.pkl
-
-# Images
-*.png
 
 # Notebooks
 *.ipynb
