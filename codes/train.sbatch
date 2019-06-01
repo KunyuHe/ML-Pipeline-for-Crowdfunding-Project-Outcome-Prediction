@@ -1,6 +1,8 @@
 #!/bin/bash
-#SBATCH --job-name=gbtrain_sbatch
-#SBATCH --time=24:00:00
+#SBATCH --job-name=gbtrain
+#SBATCH --output=gbtrain.out
+#SBATCH --error=gbtrain.err
+#SBATCH --time=72:00:00
 #SBATCH --partition=sandyb
 #SBATCH --nodes=16
 #SBATCH --mem-per-cpu=2000
