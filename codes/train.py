@@ -185,17 +185,17 @@ class ModelingPipeline:
 
         "Decision Tree": {
             'min_samples_split': np.arange(0.01, 0.11, 0.01),
-            'max_depth': [1, 5, 10, 15, 20]
+            'max_depth': [5, 10, 15, 20]
         },
 
         "Random Forest": {
-            'min_samples_split': np.arange(0.01, 0.11, 0.01),
-            'max_depth': [1, 5, 10, 15, 20],
+            'min_samples_split': np.arange(0.01, 0.11, 0.03),
+            'max_depth': [5, 10, 15, 20],
             'max_features': None
         },
 
         "Bagging": {
-            'max_samples': [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0],
+            'max_samples': [0.05, 0.1, 0.3, 0.5, 0.7, 1.0],
             'max_features': None
         },
 
@@ -206,13 +206,13 @@ class ModelingPipeline:
 
         "Gradient Boosting": {
             'learning_rate': [0.001, 0.01, 0.1, 0.5, 1, 10],
-            'subsample': [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0],
-            'max_depth': [1, 5, 10, 15, 20]
+            'subsample': [0.05, 0.1, 0.3, 0.5, 0.7, 1.0],
+            'max_depth': [5, 10, 15, 20]
         },
 
         "Extra Tree": {
-            'min_samples_split': np.arange(0.01, 0.11, 0.01),
-            'max_depth': [1, 5, 10, 15, 20],
+            'min_samples_split': np.arange(0.01, 0.11, 0.03),
+            'max_depth': [5, 10, 15, 20],
             'max_features': None
         },
 
@@ -508,6 +508,8 @@ class ModelingPipeline:
             score = self.metrics(y_true, labels)
 
             if score >= grid_best_score and score != 0:
+                if score > grid_best_score:
+                    grid_best_thresholds = []
                 grid_best_score = score
                 grid_best_thresholds.append(k)
 
@@ -581,7 +583,7 @@ class ModelingPipeline:
 
         return best_config
 
-    def plot_model(self, hyper_params, predicted_prob):
+    def plot_model(self, predicted_prob):
         """
         Plot the tuned models in to visually evaluate it in terms of predicted
         probabilities, precision-recall-population thresholds, area under curve,
@@ -701,7 +703,7 @@ class ModelingPipeline:
                 continue
 
             if self.plot:
-                self.plot_model(hyper_params, predicted_prob)
+                self.plot_model(predicted_prob)
 
             temp = [self.model_index, self.model_name, self.hyper_grid_index,
                     hyper_params, tr_time, ts_time]
@@ -717,8 +719,12 @@ class ModelingPipeline:
                     else:
                         line.append(metrics(self.y_test, labels))
                 data.loc[len(data), :] = line
+            if self.metrics_name in ["precision", "recall"]:
+                if self.verbose >= 1:
+                    logger.info(("Precision or Recall. No need for further "
+                                 "evaluations. ABORTED."))
+                break
 
-        data.drop_duplicates()
         data.to_csv(dir_path + file_name, index=False)
         self.hyper_grid_index = 0
 
