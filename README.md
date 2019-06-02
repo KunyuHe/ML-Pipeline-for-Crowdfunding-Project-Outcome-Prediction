@@ -193,55 +193,58 @@ There are also some strong positive correlation between predictors, including th
 
 ## 3. Feature Engineering
 
-*   Input Directory: `../data/`
-*   Output Directory: `../processed_data/`
-*   Code Script: [featureEngineering.py](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/codes/featureEngineering.py)
+> - Input Directory: `../data/`
+> - Output Directory: `../processed_data/`
+> - Logging Directory = `../logs/featureEngineering/`
+> - Code Script: [featureEngineering.py](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/codes/featureEngineering.py)
+> - Test Script: *in progress*
 
 
 
-### 5.1 Observations: Drop Outliers and Impute Missing Values
+### 3.1 Temporal Train Test Split
 
-I first dropped 3 outliers with extremely large values in `students_reached` and 1 in `total_price_including_optional_support`.
+In order to achieve best future predictions, we need to find the best model based on historical data. In this practice, **we do not have true actual data** because they are not yet available. I performed feature engineering and modeling in the same manner that I split the data into several training - test pairs that each **test set has a fixed time window of 4 months**, and **the corresponding training set is all observations available 60 days before the start date of the test window**.
 
-For non-numerical variables, I imputed the missing values based on the context. For example, I assumed that missing values in`primary_focus_subject`,`primary_focus_area`, and `resource_type` with `"Other"`. As there are not many values missing, this should be safe.  Users can modify `TO_FILL_NA` in the code script to change the way of imputation.
+**NOTE**: Here I left a gap of 60 days between the training set and test set in each pair so that the last observation in the training set is not using any information "from the future", as for each posted project we need at least 60 days to know whether it actually failed to get fully funded within 60 days.
 
-For numerical variables, users can specify their way to fill in with either column mean or median as indicated when the program runs.
+The data spans Jan 1, 2012 to Dec 31, 2013. Each training - test pair is called a `Batch` and we have 4 batches in total. In order to let `Batch 0` have enough training data, the first test set starts from July of 2012. Test set of `Batch 1` starts from the end of that in `Batch 0`. **The 60-days gaps I left untouched in each batch were actually included in training sets in later batches**. However, the last 60 days in our data will not be used in any batch, as we will not know their results in theory and cannot label them. The `temporal_split(*args)` function in the `featureEngineering` module implemented the split.
 
+The following table shows the time spans of the four batches:
 
-
-### 5.2 Features: Generate New Features and Select Features
-
-Based on findings of the EDA process, I modified some existing categorical variables to reduce number of levels they have. For example, I changed `teacher_prefix` into `gender` by assigning teachers with prefix `"Mrs."` and `"Ms."` with `"feamale"` and `"Mr."` with `"male"`. Here I turned it into a dummy. Users can change this behavior by modifying  `TO_COMBINE` in the code script.
-
-Then I transformed all the binary dummies to 0-1 representation, and ordinal variables like poverty and grade level to integer variables. I also generated a new variable named `posted_month` from original `date_posted`.
-
-For feature selection, I dropped some non-numerical variables because they contain too many missing values, including `school_metro` *(whether the school is in urban, suburban or rural area)*, which is really hard and dangerous to impute. I also dropped multinomial variables with too many unique levels so that after *one-hot encoding* I wouldn't end up with a large sparse matrix.
-
-
-
-### 5.3 Train Test Split
-
-In order to achieve best future predictions, we need to find the best model based on historical data. Hence in this practice, **we do not have true actual data** because they are not yet available. The whole data set would be our training set. However, for evaluation and optimization purposes, we would like to split it into training and validation sets. The `time_train_test_split()` function in the `featureEngineering` module implements this.
-
-As the data spans over time and we are predicting whether a project would get fully funded within 60 days *(nearly two months)* of posting, I applied temporal train test split technique with test sets spanning 6 months. In other words, **I created training and test sets over time, and the test sets are six months long and the training sets are all the data before each test set**.
-
-Therefore, there would be three pairs of training, test sets:
-
-| Training                | Testing                 |
-| ----------------------- | ----------------------- |
-| 2012.01.01 - 2012.01.31 | 2012.02.02 - 2012.07.30 |
-| 2012.01.01 - 2012.07.30 | 2012.08.02 - 2013.01.30 |
-| 2012.01.01 - 2013.01.30 | 2013.02.02 - 2013.07.30 |
+| Batch   | Training                 | n_train | Testing                  | n_test |
+| ------- | ------------------------ | ------- | ------------------------ | ------ |
+| Batch 0 | 2012-01-01 to 2012-04-30 |         | 2012-06-30 to 2012-10-28 |        |
+| Batch 1 | 2012-01-01 to 2012-08-29 |         | 2012-10-29 to 2013-02-26 |        |
+| Batch 2 | 2012-01-01 to 2012-12-28 |         | 2013-02-27 to 2013-06-27 |        |
+| Batch 3 | 2012-01-01 to 2013-04-28 |         | 2013-06-28 to 2013-10-26 |        |
 
 *(Time Span of Training and Test Sets)*
 
 
 
-Obviously we wasted data from `2013-08-01` to `2013-10-30`, as we would not be able to know whether projects posted after that would be fully funded by looking at historical data of year 2012 and 2013. However, as we also have information from `"future"` on when those projects got fully funded, we wasted data from `2013-11-01` to `2013-12-31`, either.
+**NOTE**: besides the last 60 days of the whole data set, I left 2013-10-27 to 2013-11-01 unused. This is because I implemented a fixed time window for test sets in each batch. This caveat can be fixed if I use variable time window for test set in `Batch 3`.
 
-This is a huge mistake and need to be improved in future patches. Also, we lost data on every first day of the first month in the test sets due to code issues. Fix those in later patches, too.
+In the `featureEngineering` module, the temporal split of data is performed first, and two preprocessing pipelines are constructed with the training and test sets for each batch. The preprocessing is thus independent between training and test sets.
 
- 
+
+
+### 3.2 Impute Missing Values
+
+For non-numerical variables, I imputed the missing values in a variety of ways. For variables with value missing because they actually should not have any value in some rows, I filled in with `"MISC"`. For those with only a few rows that have missing values, I filled in with either a new level `"Other"`, or the mode of the column. Users can modify class variable `TO_FILL_NA`to change its behavior.
+
+For numerical variables, I filled in missing values in `students_reached` with column median. Users can specify their way to fill in by modifying the function `con_fill_na()`.
+
+
+
+### 3.3 Feature Generation
+
+Based on findings of the EDA process, I modified some existing categorical variables to reduce number of levels they have. For example, I manually changed `teacher_prefix` by assigning teachers with prefix `"Dr."` to `"Mr."` (*no offense to female*). For some multinomial variables I combined levels that has less than 5% of the total into a new (or in some cases existing) level automatically. Users can change this behavior by modifying class variable `TO_COMBINE`.
+
+To reduce the effects of outliers, besides scaling I discretized `students_reached` and `total_price_including_optional_support`. I also generated new variables by extracting "year" and "month of year" from the original variable `date_posted`. I then applied one-hot-encoding to all the multi-level categorical predictors.
+
+**NOTE**: one troublesome scenario that's common after applying one-hot-encoding is that some levels appear in training set are not presented in the test sets, which leads to different number of features in training and test feature matrices. For these variables, insert a column with all zeros at the same column index in the test set. Another scenario is that some levels are in test but not in training. For them, just drop them from the test set.
+
+
 
 ## 6. Build and Evaluate Classifier
 
