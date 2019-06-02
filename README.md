@@ -7,11 +7,89 @@
 
 
 
-(Credit to Ziyu Ye, CAPP'20, for working with me to make the improved pipeline system possible)
+*(Credit to other Contributors: Ziyu Ye, CAPP'20)*
+
+## Introduction
+
+The task is to build a pipeline that predicts whether a crowdfunding project on will not get fully funded within 60 days of posting, based on data from `DonorChoose.org`.
 
 
 
-## 0. To Reproduce My Results
+The pipeline has five components:
+
+1. Read Data
+2. Explore Data
+3. Feature Engineering
+4. Build Classifier
+5. Evaluate Classifier
+
+
+
+There are three major advantages of this pipeline compared to its counterparts or predecessors that I would like to highlight in the next section.
+
+
+
+## Four Major Advantages
+
+### 1. Supports a Variety of Classification Algorithms and Evaluation Metrics
+
+The pipeline currently supports **ten classification algorithms and eight evaluation metrics** in the training and evaluation phase. It also implements **two different scalers** in the feature engineering phase. Users can run any configuration of their choice, or by default scan through all the potential combinations of them. The implemented configurations for `train.py` are listed below.
+
+
+
+| Classification Algorithms | Metrics                                      |
+| ------------------------- | -------------------------------------------- |
+| Logistic Regression       | Accuracy                                     |
+| Decision Tree             | Precision                                    |
+| Random Forest             | Recall                                       |
+| Bagging                   | F-1 Score                                    |
+| Adaptive Boosting         | AUC ROC                                      |
+| Gradient Boosting         | Scalers                                      |
+| Extra Tree                | Standard Scaler                              |
+| Linear SVM                | Precision @ [1%, 2%, 5%, 10%, 20%, 30%, 50%] |
+| KNN                       |                                              |
+| Naïve Bayes               |                                              |
+
+*(Customizable Configurations for `train.py`)*
+
+
+
+### 2. OOP Design
+
+The preprocessing pipeline and modeling pipeline are both implemented as a Python class. Scalers, models and metrics the pipelines support are listed as class variables, and a specific configuration is listed in instance variables. This design makes later improvements, like adding other classification algorithms and including extra metrics for evaluation, much easier. The code is highly modular, relatively maintainable and easy to extend.
+
+
+
+### 3. Warm Start for Recovery from Unexpected Interruptions
+
+One of the caveats of its predecessor is that if you users would like to run all possible combinations of configurations, if there is any unexpected interruption, the program need to start from scratch to fit and evaluate models (although the past evaluations are maintained), which can be really time consuming. Besides, under the same model configuration, system in the past would fit, tune, and evaluate the same model with same sets of hyperparameters all over again. Past design is neither robust to interruptions, nor efficient in running time.
+
+For this version, both issues are resolved to some extend. The solution is basically to save the cross-validation predicted probabilities for each specific pair of model and hyperparameter set in the tuning phase. If you we the same seed for the random generator, the cross-validation iterator would split the data in the same way as is, and the same pair of model and hyperparameter set would always generate the same cross-validation predicted probabilities. With these probabilities recorded, the pipeline can retrieve those from last training after any interruption or intended early stopping. Across decision thresholds and evaluation metrics, as the predicted probabilities are saved, the time consumption is merely retrieving the records. The efficiency of the system improves significantly.
+
+However, this design still need to be improved. The most apparent caveat is that the system track hyperparameter sets with serial index (*labeled from 0 to the number of sets*) if the users make any change to the hyperparameter grid, same index could point to different sets of hyperparameters and simply retrieving the corresponding record of predicted probabilities is not reasonable. One potential solution is to use a hash function to link the sets and records so that the system would save to and retrieve from different locations if the set of hyperparameter changes.
+
+
+
+### 2.4 Automate Running and Logging
+
+When the program runs, if users specify that the pipeline shall not ask for configurations, then messages would be printed to console to give you a sense about what is going on. The same message would also be written to log files stamped with starting time under the directory `./logs/train/logs`. Users can also specify the level of verbosity of the pipeline.
+
+The fine-tuned models would be evaluated on the test and plots for visualized evaluations would prompt, reporting one of the following:
+
+
+
+- Distribution of the Predicted Probabilities
+- Precision, Recall at Percentages of Population
+- Receiver Operating Characteristic Curve
+- Feature Importance *(Top 5)* Bar Plots *(if applicable)*
+
+
+
+They would stay for 3 seconds and close automatically. Then they would be saved to `/logs/train/images/`. The training and test time, all the evaluation metrics of the best models would be saved under `/evaluations/` by name of the metrics the models were optimized on.
+
+
+
+## To Reproduce My Results
 
 Change you working directory to the folder where you want the project. Clone the repository to your local with:
 
@@ -21,22 +99,20 @@ $ git clone https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outc
 
 
 
-**NOTE**: the cloning process might be slower than expected as the repo contains cross-validation predicted probabilities to give users a warm start. *(If you use the same seed for the random generator, cross-validation iterator would split the data in the same way as on mine computer, and the same pair of model-parameters pair would always generate the same cross-validation predicted probabilities)*
+**NOTE**: the cloning process might be slower than expected as the repo contains cross-validation predicted probabilities to give users a warm start.
 
 
 
 Then, run one of the following:
 
-### 0.1 Windows
+- Windows
 
 ```console
 $ chmod u+x run.sh
 $ run.sh
 ```
 
-
-
-### 0.2 Unix/Linux
+- Linux
 
 ```console
 $ chmod +x script.sh
@@ -56,73 +132,7 @@ to check what's user inputs are available for each script. **Remember that `--st
 
 
 
-## 1. Introduction
 
-The task is to build a pipeline that predicts whether a crowdfunding project on will not get fully funded within 60 days of posting, based on data from `DonorChoose.org`.
-
-
-
-The pipeline has five components:
-
-1.  Read Data
-2.  Explore Data
-3.  Feature Engineering
-4.  Build Classifier
-5.  Evaluate Classifier
-
-
-
-There are three major advantages of this pipeline compared to its counterparts or predecessors that I would like to highlight in the next section.
-
-
-
-## 2. Three Major Advantages
-
-### 2.1 Supports a Variety of Classification Algorithms and Evaluation Metrics
-
-The pipeline currently supports **ten classification algorithms and eight evaluation metrics** in the training and evaluation phase. It also implements **two different scalers** in the feature engineering phase. Users can run any configuration of their choice, or by default scan through all the potential combinations of them. The implemented configurations for `train.py` are listed below.
-
-
-
-| Classification Algorithms | Metrics   |
-| ------------------------- | --------- |
-| Logistic Regression    | Accuracy  |
-| Decision Tree | Precision |
-| Random Forest | Recall    |
-| Bagging         | F-1 Score |
-| Adaptive Boosting   | AUC ROC   |
-| Gradient Boosting         | Scalers |
-| Extra Tree   | Standard Scaler |
-| Linear SVM | Precision @ [1%, 2%, 5%, 10%, 20%, 30%, 50%] |
-| KNN | |
-| Naïve Bayes | |
-
-*(Customizable Configurations for `train.py`)*
-
-
-
-### 2.2 OOP Pipeline Design
-
-The preprocessing pipeline and modeling pipeline are both implemented as a Python class. Scalers, models and metrics the pipelines support are listed as class variables, and a specific configuration is listed in instance variables. This design makes later improvements, like adding other classification algorithms and including extra metrics for evaluation, much easier. The code is highly modular, relatively maintainable and easy to extend.
-
-
-
-### 2.3 Automate Running and Logging
-
-When the program runs, if users specify that the pipeline shall not ask for configurations, then messages would be printed to console to give you a sense about what is going on. The same message would also be written to log files stamped with starting time under the directory `./logs/train/logs`. Users can also specify the level of verbosity of the pipeline.
-
-At some points, plots for visualized evaluations would prompt, reporting one of the following:
-
-
-
-*   Distribution of the Predicted Probabilities
-*   Precision, Recall at Percentages of Population
-*   Receiver Operating Characteristic Curve
-*   Feature Importance *(Top 5)* Bar Plots *(if applicable)*
-
-
-
-They would stay for 3 seconds and close automatically. Then they would be saved to `/logs/train/images/`. Besides, the fine-tuned models would be evaluated on 
 
 
 
