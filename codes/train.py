@@ -30,7 +30,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (accuracy_score, precision_score, recall_score,
                              f1_score, roc_auc_score)
 from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
 from featureEngineering import ask, read_feature_names, create_dirs
@@ -155,8 +154,11 @@ class ModelingPipeline:
 
     """
 
-    MODEL_NAMES = ["Gradient Boosting"]
-    MODELS = [GradientBoostingClassifier]
+    MODEL_NAMES = ["Logistic Regression", "Decision Tree", "Random Forest",
+                   "Naive Bayes", "KNN", "Linear SVM"]
+    MODELS = [LogisticRegression, DecisionTreeClassifier,
+              RandomForestClassifier, GaussianNB,
+              KNeighborsClassifier, LinearSVC]
 
     METRICS_NAMES = ["accuracy", "precision", "recall", "f1", "roc_auc"]
     METRICS = [accuracy_score, precision_score, recall_score, f1_score,
@@ -389,14 +391,14 @@ class ModelingPipeline:
             self.benchmark.fit(self.X_train, self.y_train)
 
         if not self.benchmark_scores[self.metrics_index]:
-            predicted_prob = self.cross_validation_prob()
+            predicted_prob = self.clf.predict_proba(self.X_test)[:, 1]
             if self.metrics_name.startswith("Precision at"):
                 self.benchmark_scores[self.metrics_index] = self.metrics(
-                    self.y_train, predicted_prob)
+                    self.y_test, predicted_prob)
             else:
                 labels = [1 if prob >= 0.5 else 0 for prob in predicted_prob]
                 self.benchmark_scores[self.metrics_index] = self.metrics(
-                    self.y_train, labels)
+                    self.y_test, labels)
 
         logger.info(("\t %s of the benchmark default Decision Tree model "
                      "is %4.3f.") % (self.metrics_name.title(),

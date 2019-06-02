@@ -252,7 +252,7 @@ class FeaturePipeLine:
                          "using %s.") % (self.batch,
                                          self.SCALER_NAMES[self.scaler_index]))
         else:
-            dir_path = INPUT_DIR + str(self.batch) + "/"
+            dir_path = INPUT_DIR + ("Batch %s/" % self.batch)
             self.scaler = joblib.load(dir_path + 'fitted_scaler.pkl')
             logger.info("<BATCH %s: Test data preprocessing> Pre-fitted scaler "
                         "loaded.")
