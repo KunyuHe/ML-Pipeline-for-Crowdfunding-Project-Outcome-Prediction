@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     data['date_posted'] = pd.to_datetime(data['date_posted'])
     data['datefullyfunded'] = pd.to_datetime(data['datefullyfunded'])
-    data[TARGET] = ((data['datefullyfunded'] - data['date_posted']) < \
+    data[TARGET] = ((data['datefullyfunded'] - data['date_posted']) >
                      timedelta(days=LENGTH)).astype(float)
 
     data.dropna(subset=['grade_level'], inplace=True)

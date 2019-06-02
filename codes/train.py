@@ -155,10 +155,11 @@ class ModelingPipeline:
     """
 
     MODEL_NAMES = ["Logistic Regression", "Decision Tree", "Random Forest",
+                   "Bagging", "Ada Boosting", "Gradient Boosting", "Extra Tree",
                    "Naive Bayes", "KNN", "Linear SVM"]
-    MODELS = [LogisticRegression, DecisionTreeClassifier,
-              RandomForestClassifier, GaussianNB,
-              KNeighborsClassifier, LinearSVC]
+    MODELS = [LogisticRegression, DecisionTreeClassifier, RandomForestClassifier,
+              BaggingClassifier, AdaBoostClassifier, GradientBoostingClassifier,
+              ExtraTreesClassifier, GaussianNB, KNeighborsClassifier, LinearSVC]
 
     METRICS_NAMES = ["accuracy", "precision", "recall", "f1", "roc_auc"]
     METRICS = [accuracy_score, precision_score, recall_score, f1_score,

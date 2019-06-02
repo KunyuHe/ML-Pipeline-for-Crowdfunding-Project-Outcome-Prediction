@@ -70,7 +70,7 @@ However, this design still need to be improved. The most apparent caveat is that
 
 
 
-### 2.4 Automate Running and Logging
+### 4. Automate Running and Logging
 
 When the program runs, if users specify that the pipeline shall not ask for configurations, then messages would be printed to console to give you a sense about what is going on. The same message would also be written to log files stamped with starting time under the directory `./logs/train/logs`. Users can also specify the level of verbosity of the pipeline.
 
@@ -132,50 +132,48 @@ to check what's user inputs are available for each script. **Remember that `--st
 
 
 
+## 0. Get Data
+
+> - Output Directory: `../data/ `   *(All paths hereby would be relative to the `/codes/` directory)*
+
+Data can be manually downloaded from [this link](https://canvas.uchicago.edu/courses/20751/files/2388413/download?download_frd=1) on the `University of Chicago Canvas` as given. It is stored in the `../data/` directory as `projects_2012_2013.csv`. For external users, as I've uploaded the data, it would be there after cloning the repo. 
+
+The data is a CSV file that has one row for each project posted with a column for `date_posted` *(the date the project was posted)* and a column for `datefullyfunded` *(the date the project was fully funded)*. The data spans Jan 1, 2012 to Dec 31, 2013. Description of the variables in more detail can be found [here](<https://www.kaggle.com/c/kdd-cup-2014-predicting-excitement-at-donors-choose/data>).
 
 
 
+## 1. ETL
 
-## 3. Get Data
-
-*   Output Directory: `./data/ `   *(All paths hereby would be relative to the `/codes/` directory)*
-
-
-
-Data can be manually downloaded from [this link](https://canvas.uchicago.edu/courses/20751/files/2388413/download?download_frd=1) on the `University of Chicago Canvas` as given. It is stored in the `./data/` directory as `projects_2012_2013.csv`.
-
-The data is a CSV file that has one row for each project posted with a column for `date_posted` *(the date the project was posted)* and a column for `datefullyfunded` *(the date the project was fully funded)*. During  The data spans Jan 1, 2012 to Dec 31, 2013. Description of the variables can be found [here](<https://www.kaggle.com/c/kdd-cup-2014-predicting-excitement-at-donors-choose/data>).
+> - Input Directory: `../data/`
+>
+> - Output Directory: `../data/`
+>
+> - Code Script: [etl.py](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/codes/etl.py)
+> - Test Script: *in progress*
 
 
 
-## 4. ETL
-
-*   Input Directory: `../data/`
-*   Output Directory: `../data/`
-*   Code Script: [etl.py](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/codes/etl.py)
+As data comes as CSV, I used `Pandas` to read it. Two columns `date_posted` and `datefullyfunded` are converted into `datatime` and the target `fully_funded` is generated based on whether at most 59 days had passed between those two dates. We label the observation `"positive"` *(or as 1)*  if it **fails to get fully funded within 60 days**, and `"negative"` *(or as 0)* when it succeed to do so.
 
 
 
-As data comes as CSV, I used `Pandas` to read it into Python. Two columns `date_posted` and `datefullyfunded` are converted into `datatime` and the target `fully_funded` is generated based on whether at most 59 days had passed between those two dates. We label the observation "positive" if it gets fully funded within 60 days, and "negative" when it fails to do so.
+## 2. EDA
 
-
-
-## 5. EDA
-
-*   Input Directory: `../data/`
-*   Output Directory: `../EDA/images/`
-*   Notebook: [EDA.ipynb](https://mybinder.org/v2/gh/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/master?filepath=%2FEDA%2FEDA.ipynb)
-*   Code Script: [viz.py](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/codes/viz.py)
+> - Input Directory: `../data/`
+> - Output Directory: `../EDA/images/`
+> - Notebook: [EDA.ipynb](https://mybinder.org/v2/gh/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/master?filepath=%2FEDA%2FEDA.ipynb)
+> - Code Script: [viz.py](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/codes/viz.py)
+> - Test Script: *in progress*
 
 
 
 *Try the interactive Jupyter Notebook supported by `binder` if you click on the badge above*!
 
-There are 124973 observations, 88965 *(71%)* of which successfully got fully funded within 60 days of posting. 
+There are 124973 observations, nearly 29% of which didn't get fully funded within 60 days of posting. 
 
 
 
-### 4.1 Categorical Variables
+### 2.1 Categorical Variables
 
 ![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/EDA/images/figure-3.png)
 
@@ -183,7 +181,7 @@ As the bar plots above indicate, nearly half of the schools are categorized as i
 
 
 
-### 4.2 Correlation Among Variables
+### 2.2 Correlation Among Variables
 
 ![](https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction/blob/master/EDA/images/figure-5.png)
 
@@ -193,7 +191,7 @@ There are also some strong positive correlation between predictors, including th
 
 
 
-## 5. Feature Engineering
+## 3. Feature Engineering
 
 *   Input Directory: `../data/`
 *   Output Directory: `../processed_data/`
