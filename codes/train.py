@@ -391,7 +391,7 @@ class ModelingPipeline:
             self.benchmark.fit(self.X_train, self.y_train)
 
         if not self.benchmark_scores[self.metrics_index]:
-            predicted_prob = self.clf.predict_proba(self.X_test)[:, 1]
+            predicted_prob = self.benchmark.predict_proba(self.X_test)[:, 1]
             if self.metrics_name.startswith("Precision at"):
                 self.benchmark_scores[self.metrics_index] = self.metrics(
                     self.y_test, predicted_prob)

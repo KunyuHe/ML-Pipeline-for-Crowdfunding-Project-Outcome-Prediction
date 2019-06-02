@@ -7,6 +7,10 @@
 
 
 
+(Credit to Ziyu Ye, CAPP'20, for working with me to make the improved pipeline system possible)
+
+
+
 ## 0. To Reproduce My Results
 
 Change you working directory to the folder where you want the project. Clone the repository to your local with:
@@ -14,6 +18,10 @@ Change you working directory to the folder where you want the project. Clone the
 ```console
 $ git clone https://github.com/KunyuHe/ML-Pipeline-for-Crowdfunding-Project-Outcome-Prediction.git
 ```
+
+
+
+**NOTE**: the cloning process might be slower than expected as the repo contains cross-validation predicted probabilities to give users a warm start. *(If you use the same seed for the random generator, cross-validation iterator would split the data in the same way as on mine computer, and the same pair of model-parameters pair would always generate the same cross-validation predicted probabilities)*
 
 
 
@@ -37,54 +45,88 @@ $ ./run.sh
 
 
 
+**NOTE**: users can alter input parameters in the shell script to change the behavior of the scripts for Feature Engineering (`featureEngineering.py`) and Training (`train.py`). You can use:
+
+```console
+$ python featureEngineering.py -h
+$ python train.py -h
+```
+
+to check what's user inputs are available for each script. **Remember that `--start_clean=0` is mandatory for a warm start.** However, if you changed the random seed or the hyperparameter grid, please change it to `--start_clean=1` to obtain the best classifiers under the modified context. 
+
+
+
 ## 1. Introduction
 
 The task is to build a pipeline that predicts whether a crowdfunding project on will not get fully funded within 60 days of posting, based on data from `DonorChoose.org`.
 
-The pipeline has six components:
+
+
+The pipeline has five components:
 
 1.  Read Data
 2.  Explore Data
-3.  Generate Features/Predictors
+3.  Feature Engineering
 4.  Build Classifier
 5.  Evaluate Classifier
 
 
 
-The pipeline currently supports **seven classification algorithms and five evaluation metrics**, it also implements **two imputation methods and two different scalers**. User can run any configuration of his/her choice. The implemented configurations are listed below.
+There are three major advantages of this pipeline compared to its counterparts or predecessors that I would like to highlight in the next section.
 
 
 
-| Imputation Methods | Scalers         | Classification Algorithms | Metrics   |
-| ------------- | --------------- | ------------------------- | --------- |
-| Column Mean   | Standard Scaler | KNN                       | Accuracy  |
-| Column Median | Mini-max Scaler | Logistic Regression       | Precision |
-|               |                 | Decision Tree             | Recall    |
-|               |                 | Linear SVC                | F-1 Score |
-|               |                 | Bagging                   | AUC ROC   |
-|               |                 | Boosting                  |           |
-|               |                 | Random Forest             |           |
+## 2. Three Major Advantages
 
-*(Customizable Configurations)*
+### 2.1 Supports a Variety of Classification Algorithms and Evaluation Metrics
+
+The pipeline currently supports **ten classification algorithms and eight evaluation metrics** in the training and evaluation phase. It also implements **two different scalers** in the feature engineering phase. Users can run any configuration of their choice, or by default scan through all the potential combinations of them. The implemented configurations for `train.py` are listed below.
 
 
 
-Upon running the program, use `keyboard input` to specify your configuration when notified to. You can also choose to run all possible configurations by sequence *(but it takes really long)*.
+| Classification Algorithms | Metrics   |
+| ------------------------- | --------- |
+| Logistic Regression    | Accuracy  |
+| Decision Tree | Precision |
+| Random Forest | Recall    |
+| Bagging         | F-1 Score |
+| Adaptive Boosting   | AUC ROC   |
+| Gradient Boosting         | Scalers |
+| Extra Tree   | Standard Scaler |
+| Linear SVM | Precision @ [1%, 2%, 5%, 10%, 20%, 30%, 50%] |
+| KNN | |
+| Naïve Bayes | |
 
-When the program runs, messages would be printed to console to give you a sense about what it is doing. Also at some points, there would be prompted plots reporting one of the following:
+*(Customizable Configurations for `train.py`)*
+
+
+
+### 2.2 OOP Pipeline Design
+
+The preprocessing pipeline and modeling pipeline are both implemented as a Python class. Scalers, models and metrics the pipelines support are listed as class variables, and a specific configuration is listed in instance variables. This design makes later improvements, like adding other classification algorithms and including extra metrics for evaluation, much easier. The code is highly modular, relatively maintainable and easy to extend.
+
+
+
+### 2.3 Automate Running and Logging
+
+When the program runs, if users specify that the pipeline shall not ask for configurations, then messages would be printed to console to give you a sense about what is going on. The same message would also be written to log files stamped with starting time under the directory `./logs/train/logs`. Users can also specify the level of verbosity of the pipeline.
+
+At some points, plots for visualized evaluations would prompt, reporting one of the following:
+
+
 
 *   Distribution of the Predicted Probabilities
-*   Precision, Recall Curve and Percent of Polpulation
+*   Precision, Recall at Percentages of Population
 *   Receiver Operating Characteristic Curve
 *   Feature Importance *(Top 5)* Bar Plots *(if applicable)*
 
 
 
-They would stay for 3 seconds and close automatically. Then they would be saved to `/log/images/`. **Please do not close them manually, or your progress would be killed**.
+They would stay for 3 seconds and close automatically. Then they would be saved to `/logs/train/images/`. Besides, the fine-tuned models would be evaluated on 
 
 
 
-## 2. Get Data
+## 3. Get Data
 
 *   Output Directory: `./data/ `   *(All paths hereby would be relative to the `/codes/` directory)*
 
@@ -96,7 +138,7 @@ The data is a CSV file that has one row for each project posted with a column fo
 
 
 
-## 3. ETL
+## 4. ETL
 
 *   Input Directory: `../data/`
 *   Output Directory: `../data/`
@@ -108,7 +150,7 @@ As data comes as CSV, I used `Pandas` to read it into Python. Two columns `date_
 
 
 
-## 4. EDA
+## 5. EDA
 
 *   Input Directory: `../data/`
 *   Output Directory: `../EDA/images/`
