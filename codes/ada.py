@@ -50,8 +50,6 @@ logger = logging.getLogger('train')
 logger.setLevel(logging.INFO)
 ch = logging.StreamHandler()
 logger.addHandler(ch)
-fh = logging.FileHandler(LOG_DIR + time.strftime("%Y%m%d-%H%M%S") + '.log')
-logger.addHandler(fh)
 
 warnings.filterwarnings("ignore")
 
