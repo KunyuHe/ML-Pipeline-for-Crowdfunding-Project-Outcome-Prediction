@@ -1,0 +1,231 @@
+**--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+<TRAINING-TEST PAIR 0>
+<TRAINING SET TIME RANGE> 2012-01-01 - 2012-04-30
+<TEST SET TIME RANGE> 2012-06-30 - 2012-10-28
+
+
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+<BATCH 0; Pipeline Setup>
+Config: 5-Fold Cross-Validation;
+Do NOT Ask User for Model and Metrics;
+Level of Verbosity: 0; 
+Do  Include Plots for Evaluations
+	Finished reading processed data.
+	5-fold cross-validation generator set up with random seed '123'.
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+
+
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+<BATCH 0; Model Configured. Random Forest.>
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Accuracy.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Accuracy.
+	 Accuracy of the benchmark default Decision Tree model is 0.629.
+
+
+<BATCH 0 - Random Forest to be optimized on Accuracy> Search Starts (256 hyperparameter sets):
+<BATCH 0 - Random Forest to be optimized on Accuracy> Search Finished. The highest cross-validation accuracy is 0.7225. There are 2 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision.
+	 Precision of the benchmark default Decision Tree model is 0.302.
+
+
+<BATCH 0 - Random Forest to be optimized on Precision> Search Starts (256 hyperparameter sets):
+<BATCH 0 - Random Forest to be optimized on Precision> Search Finished. The highest cross-validation precision is 1.0000. There are 15 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Recall.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Recall.
+	 Recall of the benchmark default Decision Tree model is 0.376.
+
+
+<BATCH 0 - Random Forest to be optimized on Recall> Search Starts (256 hyperparameter sets):
+<BATCH 0 - Random Forest to be optimized on Recall> Search Finished. The highest cross-validation recall is 1.0000. There are 104 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. F1.>
+
+
+<BATCH 0> Start to set benchmark for the metrics F1.
+	 F1 of the benchmark default Decision Tree model is 0.335.
+
+
+<BATCH 0 - Random Forest to be optimized on F1> Search Starts (256 hyperparameter sets):
+<BATCH 0 - Random Forest to be optimized on F1> Search Finished. The highest cross-validation f1 is 0.5580. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Roc_Auc.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Roc_Auc.
+	 Roc_Auc of the benchmark default Decision Tree model is 0.544.
+
+
+<BATCH 0 - Random Forest to be optimized on Roc_Auc> Search Starts (256 hyperparameter sets):
+<BATCH 0 - Random Forest to be optimized on Roc_Auc> Search Finished. The highest cross-validation roc_auc is 0.6652. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 1%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 1%.
+	 Precision At 1% of the benchmark default Decision Tree model is 0.303.
+
+
+<BATCH 0 - Random Forest to be optimized on Precision At 1%> Search Starts (256 hyperparameter sets):
+<BATCH 0 - Random Forest to be optimized on Precision At 1%> Search Finished. The highest cross-validation Precision at 1% is 0.8221. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 2%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 2%.
+	 Precision At 2% of the benchmark default Decision Tree model is 0.303.
+
+
+<BATCH 0 - Random Forest to be optimized on Precision At 2%> Search Starts (256 hyperparameter sets):
+<BATCH 0 - Random Forest to be optimized on Precision At 2%> Search Finished. The highest cross-validation Precision at 2% is 0.7926. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 5%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 5%.
+	 Precision At 5% of the benchmark default Decision Tree model is 0.303.
+
+
+<BATCH 0 - Random Forest to be optimized on Precision At 5%> Search Starts (256 hyperparameter sets):
+<BATCH 0 - Random Forest to be optimized on Precision At 5%> Search Finished. The highest cross-validation Precision at 5% is 0.7736. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 10%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 10%.
+	 Precision At 10% of the benchmark default Decision Tree model is 0.303.
+
+
+<BATCH 0 - Random Forest to be optimized on Precision At 10%> Search Starts (256 hyperparameter sets):
+<BATCH 0 - Random Forest to be optimized on Precision At 10%> Search Finished. The highest cross-validation Precision at 10% is 0.6622. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 20%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 20%.
+	 Precision At 20% of the benchmark default Decision Tree model is 0.303.
+
+
+<BATCH 0 - Random Forest to be optimized on Precision At 20%> Search Starts (256 hyperparameter sets):
+<BATCH 0 - Random Forest to be optimized on Precision At 20%> Search Finished. The highest cross-validation Precision at 20% is 0.5780. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 30%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 30%.
+	 Precision At 30% of the benchmark default Decision Tree model is 0.303.
+
+
+<BATCH 0 - Random Forest to be optimized on Precision At 30%> Search Starts (256 hyperparameter sets):
+<BATCH 0 - Random Forest to be optimized on Precision At 30%> Search Finished. The highest cross-validation Precision at 30% is 0.4723. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 50%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 50%.
+	 Precision At 50% of the benchmark default Decision Tree model is 0.249.
+
+
+<BATCH 0 - Random Forest to be optimized on Precision At 50%> Search Starts (256 hyperparameter sets):
+<BATCH 0 - Random Forest to be optimized on Precision At 50%> Search Finished. The highest cross-validation Precision at 50% is 0.4469. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+**--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+**--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+<TRAINING-TEST PAIR 2>
+<TRAINING SET TIME RANGE> 2012-01-01 - 2012-12-28
+<TEST SET TIME RANGE> 2013-02-27 - 2013-06-27
+
+
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+<BATCH 1; Pipeline Setup>
+Config: 5-Fold Cross-Validation;
+Do NOT Ask User for Model and Metrics;
+Level of Verbosity: 0; 
+Do  Include Plots for Evaluations
+	Finished reading processed data.
+	5-fold cross-validation generator set up with random seed '123'.
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+
+
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+<BATCH 1; Model Configured. Random Forest.>
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. Accuracy.>
+
+
+<BATCH 1> Start to set benchmark for the metrics Accuracy.
+	 Accuracy of the benchmark default Decision Tree model is 0.590.
+
+
+<BATCH 1 - Random Forest to be optimized on Accuracy> Search Starts (288 hyperparameter sets):
+slurmstepd-midway2-0002: error: *** JOB 60597653 ON midway2-0002 CANCELLED AT 2019-06-03T11:42:22 DUE TO TIME LIMIT ***
