@@ -3,7 +3,7 @@
 #SBATCH --output=bag.out
 #SBATCH --error=bag.err
 #SBATCH --time=12:00:00
-#SBATCH --partition=sandyb
+#SBATCH --partition=broadwl
 #SBATCH --nodes=8
 #SBATCH --mem-per-cpu=2000
 
