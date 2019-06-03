@@ -1,0 +1,804 @@
+**--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+<TRAINING-TEST PAIR 0>
+<TRAINING SET TIME RANGE> 2012-01-01 - 2012-04-30
+<TEST SET TIME RANGE> 2012-06-30 - 2012-10-28
+
+
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+<BATCH 0; Pipeline Setup>
+Config: 5-Fold Cross-Validation;
+Do NOT Ask User for Model and Metrics;
+Level of Verbosity: 0; 
+Do NOT Include Plots for Evaluations
+	Finished reading processed data.
+	5-fold cross-validation generator set up with random seed '123'.
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+
+
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+<BATCH 0; Model Configured. Ada Boosting.>
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Accuracy.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Accuracy.
+	 Accuracy of the benchmark default Decision Tree model is 0.629.
+
+
+<BATCH 0 - Ada Boosting to be optimized on Accuracy> Search Starts (12 hyperparameter sets):
+<BATCH 0 - Ada Boosting to be optimized on Accuracy> Search Finished. The highest cross-validation accuracy is 0.7080. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision.
+	 Precision of the benchmark default Decision Tree model is 0.302.
+
+
+<BATCH 0 - Ada Boosting to be optimized on Precision> Search Starts (12 hyperparameter sets):
+<BATCH 0 - Ada Boosting to be optimized on Precision> Search Finished. The highest cross-validation precision is 0.3548. There are 2 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Recall.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Recall.
+	 Recall of the benchmark default Decision Tree model is 0.376.
+
+
+<BATCH 0 - Ada Boosting to be optimized on Recall> Search Starts (12 hyperparameter sets):
+<BATCH 0 - Ada Boosting to be optimized on Recall> Search Finished. The highest cross-validation recall is 1.0000. There are 5 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. F1.>
+
+
+<BATCH 0> Start to set benchmark for the metrics F1.
+	 F1 of the benchmark default Decision Tree model is 0.335.
+
+
+<BATCH 0 - Ada Boosting to be optimized on F1> Search Starts (12 hyperparameter sets):
+<BATCH 0 - Ada Boosting to be optimized on F1> Search Finished. The highest cross-validation f1 is 0.5088. There are 2 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Roc_Auc.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Roc_Auc.
+	 Roc_Auc of the benchmark default Decision Tree model is 0.544.
+
+
+<BATCH 0 - Ada Boosting to be optimized on Roc_Auc> Search Starts (12 hyperparameter sets):
+<BATCH 0 - Ada Boosting to be optimized on Roc_Auc> Search Finished. The highest cross-validation roc_auc is 0.5902. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 1%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 1%.
+	 Precision At 1% of the benchmark default Decision Tree model is 0.303.
+
+
+<BATCH 0 - Ada Boosting to be optimized on Precision At 1%> Search Starts (12 hyperparameter sets):
+<BATCH 0 - Ada Boosting to be optimized on Precision At 1%> Search Finished. The highest cross-validation Precision at 1% is 0.6759. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 2%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 2%.
+	 Precision At 2% of the benchmark default Decision Tree model is 0.303.
+
+
+<BATCH 0 - Ada Boosting to be optimized on Precision At 2%> Search Starts (12 hyperparameter sets):
+<BATCH 0 - Ada Boosting to be optimized on Precision At 2%> Search Finished. The highest cross-validation Precision at 2% is 0.6759. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 5%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 5%.
+	 Precision At 5% of the benchmark default Decision Tree model is 0.303.
+
+
+<BATCH 0 - Ada Boosting to be optimized on Precision At 5%> Search Starts (12 hyperparameter sets):
+<BATCH 0 - Ada Boosting to be optimized on Precision At 5%> Search Finished. The highest cross-validation Precision at 5% is 0.6759. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 10%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 10%.
+	 Precision At 10% of the benchmark default Decision Tree model is 0.303.
+
+
+<BATCH 0 - Ada Boosting to be optimized on Precision At 10%> Search Starts (12 hyperparameter sets):
+<BATCH 0 - Ada Boosting to be optimized on Precision At 10%> Search Finished. The highest cross-validation Precision at 10% is 0.5961. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 20%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 20%.
+	 Precision At 20% of the benchmark default Decision Tree model is 0.303.
+
+
+<BATCH 0 - Ada Boosting to be optimized on Precision At 20%> Search Starts (12 hyperparameter sets):
+<BATCH 0 - Ada Boosting to be optimized on Precision At 20%> Search Finished. The highest cross-validation Precision at 20% is 0.4663. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 30%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 30%.
+	 Precision At 30% of the benchmark default Decision Tree model is 0.303.
+
+
+<BATCH 0 - Ada Boosting to be optimized on Precision At 30%> Search Starts (12 hyperparameter sets):
+<BATCH 0 - Ada Boosting to be optimized on Precision At 30%> Search Finished. The highest cross-validation Precision at 30% is 0.3548. There are 3 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 0; Metrics Configured. Precision At 50%.>
+
+
+<BATCH 0> Start to set benchmark for the metrics Precision At 50%.
+	 Precision At 50% of the benchmark default Decision Tree model is 0.249.
+
+
+<BATCH 0 - Ada Boosting to be optimized on Precision At 50%> Search Starts (12 hyperparameter sets):
+<BATCH 0 - Ada Boosting to be optimized on Precision At 50%> Search Finished. The highest cross-validation Precision at 50% is 0.3548. There are 3 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+**--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+**--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+<TRAINING-TEST PAIR 2>
+<TRAINING SET TIME RANGE> 2012-01-01 - 2012-12-28
+<TEST SET TIME RANGE> 2013-02-27 - 2013-06-27
+
+
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+<BATCH 1; Pipeline Setup>
+Config: 5-Fold Cross-Validation;
+Do NOT Ask User for Model and Metrics;
+Level of Verbosity: 0; 
+Do NOT Include Plots for Evaluations
+	Finished reading processed data.
+	5-fold cross-validation generator set up with random seed '123'.
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+
+
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+<BATCH 1; Model Configured. Ada Boosting.>
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. Accuracy.>
+
+
+<BATCH 1> Start to set benchmark for the metrics Accuracy.
+	 Accuracy of the benchmark default Decision Tree model is 0.590.
+
+
+<BATCH 1 - Ada Boosting to be optimized on Accuracy> Search Starts (12 hyperparameter sets):
+<BATCH 1 - Ada Boosting to be optimized on Accuracy> Search Finished. The highest cross-validation accuracy is 0.7284. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. Precision.>
+
+
+<BATCH 1> Start to set benchmark for the metrics Precision.
+	 Precision of the benchmark default Decision Tree model is 0.373.
+
+
+<BATCH 1 - Ada Boosting to be optimized on Precision> Search Starts (12 hyperparameter sets):
+<BATCH 1 - Ada Boosting to be optimized on Precision> Search Finished. The highest cross-validation precision is 0.3194. There are 2 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. Recall.>
+
+
+<BATCH 1> Start to set benchmark for the metrics Recall.
+	 Recall of the benchmark default Decision Tree model is 0.380.
+
+
+<BATCH 1 - Ada Boosting to be optimized on Recall> Search Starts (12 hyperparameter sets):
+<BATCH 1 - Ada Boosting to be optimized on Recall> Search Finished. The highest cross-validation recall is 1.0000. There are 5 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. F1.>
+
+
+<BATCH 1> Start to set benchmark for the metrics F1.
+	 F1 of the benchmark default Decision Tree model is 0.377.
+
+
+<BATCH 1 - Ada Boosting to be optimized on F1> Search Starts (12 hyperparameter sets):
+<BATCH 1 - Ada Boosting to be optimized on F1> Search Finished. The highest cross-validation f1 is 0.4728. There are 2 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. Roc_Auc.>
+
+
+<BATCH 1> Start to set benchmark for the metrics Roc_Auc.
+	 Roc_Auc of the benchmark default Decision Tree model is 0.536.
+
+
+<BATCH 1 - Ada Boosting to be optimized on Roc_Auc> Search Starts (12 hyperparameter sets):
+<BATCH 1 - Ada Boosting to be optimized on Roc_Auc> Search Finished. The highest cross-validation roc_auc is 0.5761. There are 4 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. Precision At 1%.>
+
+
+<BATCH 1> Start to set benchmark for the metrics Precision At 1%.
+	 Precision At 1% of the benchmark default Decision Tree model is 0.375.
+
+
+<BATCH 1 - Ada Boosting to be optimized on Precision At 1%> Search Starts (12 hyperparameter sets):
+<BATCH 1 - Ada Boosting to be optimized on Precision At 1%> Search Finished. The highest cross-validation Precision at 1% is 0.5832. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. Precision At 2%.>
+
+
+<BATCH 1> Start to set benchmark for the metrics Precision At 2%.
+	 Precision At 2% of the benchmark default Decision Tree model is 0.375.
+
+
+<BATCH 1 - Ada Boosting to be optimized on Precision At 2%> Search Starts (12 hyperparameter sets):
+<BATCH 1 - Ada Boosting to be optimized on Precision At 2%> Search Finished. The highest cross-validation Precision at 2% is 0.5832. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. Precision At 5%.>
+
+
+<BATCH 1> Start to set benchmark for the metrics Precision At 5%.
+	 Precision At 5% of the benchmark default Decision Tree model is 0.375.
+
+
+<BATCH 1 - Ada Boosting to be optimized on Precision At 5%> Search Starts (12 hyperparameter sets):
+<BATCH 1 - Ada Boosting to be optimized on Precision At 5%> Search Finished. The highest cross-validation Precision at 5% is 0.5832. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. Precision At 10%.>
+
+
+<BATCH 1> Start to set benchmark for the metrics Precision At 10%.
+	 Precision At 10% of the benchmark default Decision Tree model is 0.375.
+
+
+<BATCH 1 - Ada Boosting to be optimized on Precision At 10%> Search Starts (12 hyperparameter sets):
+<BATCH 1 - Ada Boosting to be optimized on Precision At 10%> Search Finished. The highest cross-validation Precision at 10% is 0.3194. There are 4 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. Precision At 20%.>
+
+
+<BATCH 1> Start to set benchmark for the metrics Precision At 20%.
+	 Precision At 20% of the benchmark default Decision Tree model is 0.375.
+
+
+<BATCH 1 - Ada Boosting to be optimized on Precision At 20%> Search Starts (12 hyperparameter sets):
+<BATCH 1 - Ada Boosting to be optimized on Precision At 20%> Search Finished. The highest cross-validation Precision at 20% is 0.3194. There are 4 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. Precision At 30%.>
+
+
+<BATCH 1> Start to set benchmark for the metrics Precision At 30%.
+	 Precision At 30% of the benchmark default Decision Tree model is 0.375.
+
+
+<BATCH 1 - Ada Boosting to be optimized on Precision At 30%> Search Starts (12 hyperparameter sets):
+<BATCH 1 - Ada Boosting to be optimized on Precision At 30%> Search Finished. The highest cross-validation Precision at 30% is 0.3194. There are 4 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 1; Metrics Configured. Precision At 50%.>
+
+
+<BATCH 1> Start to set benchmark for the metrics Precision At 50%.
+	 Precision At 50% of the benchmark default Decision Tree model is 0.326.
+
+
+<BATCH 1 - Ada Boosting to be optimized on Precision At 50%> Search Starts (12 hyperparameter sets):
+<BATCH 1 - Ada Boosting to be optimized on Precision At 50%> Search Finished. The highest cross-validation Precision at 50% is 0.3194. There are 4 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+**--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+**--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+<TRAINING-TEST PAIR 1>
+<TRAINING SET TIME RANGE> 2012-01-01 - 2012-08-29
+<TEST SET TIME RANGE> 2012-10-29 - 2013-02-26
+
+
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+<BATCH 2; Pipeline Setup>
+Config: 5-Fold Cross-Validation;
+Do NOT Ask User for Model and Metrics;
+Level of Verbosity: 0; 
+Do NOT Include Plots for Evaluations
+	Finished reading processed data.
+	5-fold cross-validation generator set up with random seed '123'.
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+
+
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+<BATCH 2; Model Configured. Ada Boosting.>
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 2; Metrics Configured. Accuracy.>
+
+
+<BATCH 2> Start to set benchmark for the metrics Accuracy.
+	 Accuracy of the benchmark default Decision Tree model is 0.612.
+
+
+<BATCH 2 - Ada Boosting to be optimized on Accuracy> Search Starts (12 hyperparameter sets):
+<BATCH 2 - Ada Boosting to be optimized on Accuracy> Search Finished. The highest cross-validation accuracy is 0.7119. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 2; Metrics Configured. Precision.>
+
+
+<BATCH 2> Start to set benchmark for the metrics Precision.
+	 Precision of the benchmark default Decision Tree model is 0.337.
+
+
+<BATCH 2 - Ada Boosting to be optimized on Precision> Search Starts (12 hyperparameter sets):
+<BATCH 2 - Ada Boosting to be optimized on Precision> Search Finished. The highest cross-validation precision is 0.3434. There are 2 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 2; Metrics Configured. Recall.>
+
+
+<BATCH 2> Start to set benchmark for the metrics Recall.
+	 Recall of the benchmark default Decision Tree model is 0.375.
+
+
+<BATCH 2 - Ada Boosting to be optimized on Recall> Search Starts (12 hyperparameter sets):
+<BATCH 2 - Ada Boosting to be optimized on Recall> Search Finished. The highest cross-validation recall is 1.0000. There are 5 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 2; Metrics Configured. F1.>
+
+
+<BATCH 2> Start to set benchmark for the metrics F1.
+	 F1 of the benchmark default Decision Tree model is 0.355.
+
+
+<BATCH 2 - Ada Boosting to be optimized on F1> Search Starts (12 hyperparameter sets):
+<BATCH 2 - Ada Boosting to be optimized on F1> Search Finished. The highest cross-validation f1 is 0.4974. There are 2 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 2; Metrics Configured. Roc_Auc.>
+
+
+<BATCH 2> Start to set benchmark for the metrics Roc_Auc.
+	 Roc_Auc of the benchmark default Decision Tree model is 0.541.
+
+
+<BATCH 2 - Ada Boosting to be optimized on Roc_Auc> Search Starts (12 hyperparameter sets):
+<BATCH 2 - Ada Boosting to be optimized on Roc_Auc> Search Finished. The highest cross-validation roc_auc is 0.5808. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 2; Metrics Configured. Precision At 1%.>
+
+
+<BATCH 2> Start to set benchmark for the metrics Precision At 1%.
+	 Precision At 1% of the benchmark default Decision Tree model is 0.338.
+
+
+<BATCH 2 - Ada Boosting to be optimized on Precision At 1%> Search Starts (12 hyperparameter sets):
+<BATCH 2 - Ada Boosting to be optimized on Precision At 1%> Search Finished. The highest cross-validation Precision at 1% is 0.6325. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 2; Metrics Configured. Precision At 2%.>
+
+
+<BATCH 2> Start to set benchmark for the metrics Precision At 2%.
+	 Precision At 2% of the benchmark default Decision Tree model is 0.338.
+
+
+<BATCH 2 - Ada Boosting to be optimized on Precision At 2%> Search Starts (12 hyperparameter sets):
+<BATCH 2 - Ada Boosting to be optimized on Precision At 2%> Search Finished. The highest cross-validation Precision at 2% is 0.6325. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 2; Metrics Configured. Precision At 5%.>
+
+
+<BATCH 2> Start to set benchmark for the metrics Precision At 5%.
+	 Precision At 5% of the benchmark default Decision Tree model is 0.338.
+
+
+<BATCH 2 - Ada Boosting to be optimized on Precision At 5%> Search Starts (12 hyperparameter sets):
+<BATCH 2 - Ada Boosting to be optimized on Precision At 5%> Search Finished. The highest cross-validation Precision at 5% is 0.5908. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 2; Metrics Configured. Precision At 10%.>
+
+
+<BATCH 2> Start to set benchmark for the metrics Precision At 10%.
+	 Precision At 10% of the benchmark default Decision Tree model is 0.338.
+
+
+<BATCH 2 - Ada Boosting to be optimized on Precision At 10%> Search Starts (12 hyperparameter sets):
+<BATCH 2 - Ada Boosting to be optimized on Precision At 10%> Search Finished. The highest cross-validation Precision at 10% is 0.5742. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 2; Metrics Configured. Precision At 20%.>
+
+
+<BATCH 2> Start to set benchmark for the metrics Precision At 20%.
+	 Precision At 20% of the benchmark default Decision Tree model is 0.338.
+
+
+<BATCH 2 - Ada Boosting to be optimized on Precision At 20%> Search Starts (12 hyperparameter sets):
+<BATCH 2 - Ada Boosting to be optimized on Precision At 20%> Search Finished. The highest cross-validation Precision at 20% is 0.4398. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 2; Metrics Configured. Precision At 30%.>
+
+
+<BATCH 2> Start to set benchmark for the metrics Precision At 30%.
+	 Precision At 30% of the benchmark default Decision Tree model is 0.338.
+
+
+<BATCH 2 - Ada Boosting to be optimized on Precision At 30%> Search Starts (12 hyperparameter sets):
+<BATCH 2 - Ada Boosting to be optimized on Precision At 30%> Search Finished. The highest cross-validation Precision at 30% is 0.3434. There are 3 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 2; Metrics Configured. Precision At 50%.>
+
+
+<BATCH 2> Start to set benchmark for the metrics Precision At 50%.
+	 Precision At 50% of the benchmark default Decision Tree model is 0.285.
+
+
+<BATCH 2 - Ada Boosting to be optimized on Precision At 50%> Search Starts (12 hyperparameter sets):
+<BATCH 2 - Ada Boosting to be optimized on Precision At 50%> Search Finished. The highest cross-validation Precision at 50% is 0.3434. There are 3 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+**--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+**--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+<TRAINING-TEST PAIR 3>
+<TRAINING SET TIME RANGE> 2012-01-01 - 2013-04-28
+<TEST SET TIME RANGE> 2013-06-28 - 2013-10-26
+
+
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+<BATCH 3; Pipeline Setup>
+Config: 5-Fold Cross-Validation;
+Do NOT Ask User for Model and Metrics;
+Level of Verbosity: 0; 
+Do NOT Include Plots for Evaluations
+	Finished reading processed data.
+	5-fold cross-validation generator set up with random seed '123'.
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+
+
+##----------------------------------------------------------------------------------------------------------------------------------------------------------------##
+<BATCH 3; Model Configured. Ada Boosting.>
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 3; Metrics Configured. Accuracy.>
+
+
+<BATCH 3> Start to set benchmark for the metrics Accuracy.
+	 Accuracy of the benchmark default Decision Tree model is 0.624.
+
+
+<BATCH 3 - Ada Boosting to be optimized on Accuracy> Search Starts (12 hyperparameter sets):
+<BATCH 3 - Ada Boosting to be optimized on Accuracy> Search Finished. The highest cross-validation accuracy is 0.7220. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 3; Metrics Configured. Precision.>
+
+
+<BATCH 3> Start to set benchmark for the metrics Precision.
+	 Precision of the benchmark default Decision Tree model is 0.311.
+
+
+<BATCH 3 - Ada Boosting to be optimized on Precision> Search Starts (12 hyperparameter sets):
+<BATCH 3 - Ada Boosting to be optimized on Precision> Search Finished. The highest cross-validation precision is 0.3237. There are 3 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 3; Metrics Configured. Recall.>
+
+
+<BATCH 3> Start to set benchmark for the metrics Recall.
+	 Recall of the benchmark default Decision Tree model is 0.352.
+
+
+<BATCH 3 - Ada Boosting to be optimized on Recall> Search Starts (12 hyperparameter sets):
+<BATCH 3 - Ada Boosting to be optimized on Recall> Search Finished. The highest cross-validation recall is 1.0000. There are 5 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 3; Metrics Configured. F1.>
+
+
+<BATCH 3> Start to set benchmark for the metrics F1.
+	 F1 of the benchmark default Decision Tree model is 0.331.
+
+
+<BATCH 3 - Ada Boosting to be optimized on F1> Search Starts (12 hyperparameter sets):
+<BATCH 3 - Ada Boosting to be optimized on F1> Search Finished. The highest cross-validation f1 is 0.4776. There are 3 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 3; Metrics Configured. Roc_Auc.>
+
+
+<BATCH 3> Start to set benchmark for the metrics Roc_Auc.
+	 Roc_Auc of the benchmark default Decision Tree model is 0.537.
+
+
+<BATCH 3 - Ada Boosting to be optimized on Roc_Auc> Search Starts (12 hyperparameter sets):
+<BATCH 3 - Ada Boosting to be optimized on Roc_Auc> Search Finished. The highest cross-validation roc_auc is 0.5771. There are 5 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 3; Metrics Configured. Precision At 1%.>
+
+
+<BATCH 3> Start to set benchmark for the metrics Precision At 1%.
+	 Precision At 1% of the benchmark default Decision Tree model is 0.313.
+
+
+<BATCH 3 - Ada Boosting to be optimized on Precision At 1%> Search Starts (12 hyperparameter sets):
+<BATCH 3 - Ada Boosting to be optimized on Precision At 1%> Search Finished. The highest cross-validation Precision at 1% is 0.5605. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 3; Metrics Configured. Precision At 2%.>
+
+
+<BATCH 3> Start to set benchmark for the metrics Precision At 2%.
+	 Precision At 2% of the benchmark default Decision Tree model is 0.313.
+
+
+<BATCH 3 - Ada Boosting to be optimized on Precision At 2%> Search Starts (12 hyperparameter sets):
+<BATCH 3 - Ada Boosting to be optimized on Precision At 2%> Search Finished. The highest cross-validation Precision at 2% is 0.5605. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 3; Metrics Configured. Precision At 5%.>
+
+
+<BATCH 3> Start to set benchmark for the metrics Precision At 5%.
+	 Precision At 5% of the benchmark default Decision Tree model is 0.313.
+
+
+<BATCH 3 - Ada Boosting to be optimized on Precision At 5%> Search Starts (12 hyperparameter sets):
+<BATCH 3 - Ada Boosting to be optimized on Precision At 5%> Search Finished. The highest cross-validation Precision at 5% is 0.5605. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 3; Metrics Configured. Precision At 10%.>
+
+
+<BATCH 3> Start to set benchmark for the metrics Precision At 10%.
+	 Precision At 10% of the benchmark default Decision Tree model is 0.313.
+
+
+<BATCH 3 - Ada Boosting to be optimized on Precision At 10%> Search Starts (12 hyperparameter sets):
+<BATCH 3 - Ada Boosting to be optimized on Precision At 10%> Search Finished. The highest cross-validation Precision at 10% is 0.4387. There are 1 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 3; Metrics Configured. Precision At 20%.>
+
+
+<BATCH 3> Start to set benchmark for the metrics Precision At 20%.
+	 Precision At 20% of the benchmark default Decision Tree model is 0.313.
+
+
+<BATCH 3 - Ada Boosting to be optimized on Precision At 20%> Search Starts (12 hyperparameter sets):
+<BATCH 3 - Ada Boosting to be optimized on Precision At 20%> Search Finished. The highest cross-validation Precision at 20% is 0.3237. There are 5 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 3; Metrics Configured. Precision At 30%.>
+
+
+<BATCH 3> Start to set benchmark for the metrics Precision At 30%.
+	 Precision At 30% of the benchmark default Decision Tree model is 0.263.
+
+
+<BATCH 3 - Ada Boosting to be optimized on Precision At 30%> Search Starts (12 hyperparameter sets):
+<BATCH 3 - Ada Boosting to be optimized on Precision At 30%> Search Finished. The highest cross-validation Precision at 30% is 0.3237. There are 5 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+<BATCH 3; Metrics Configured. Precision At 50%.>
+
+
+<BATCH 3> Start to set benchmark for the metrics Precision At 50%.
+	 Precision At 50% of the benchmark default Decision Tree model is 0.263.
+
+
+<BATCH 3 - Ada Boosting to be optimized on Precision At 50%> Search Starts (12 hyperparameter sets):
+<BATCH 3 - Ada Boosting to be optimized on Precision At 50%> Search Finished. The highest cross-validation Precision at 50% is 0.3237. There are 5 best sets.
+
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+**--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+Traceback (most recent call last):
+  File "ada.py", line 790, in <module>
+    _ = input("Press any key to exit.")
+EOFError: EOF when reading a line
