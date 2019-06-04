@@ -4,7 +4,7 @@
 #SBATCH --error=rfc.err
 #SBATCH --time=24:00:00
 #SBATCH --partition=sandyb
-#SBATCH --nodes=24
+#SBATCH --nodes=18
 #SBATCH --mem-per-cpu=16000
 
 module load Anaconda3/2018.12
