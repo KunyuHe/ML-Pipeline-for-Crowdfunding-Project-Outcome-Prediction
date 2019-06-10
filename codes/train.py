@@ -1,9 +1,7 @@
 """
 Title:       Build a training pipeline that helps user fit models, tune
              hyperparameters, evaluate best models and save results.
-
 Description:
-
 Author:      Kunyu He, CAPP'20, The University of Chicago
 """
 
@@ -32,7 +30,7 @@ from sklearn.metrics import (accuracy_score, precision_score, recall_score,
 from sklearn.model_selection import StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier
 
-from featureEngineering import ask, read_feature_names, create_dirs
+from featureEngineering import read_feature_names
 from trainviz import (plot_predicted_scores, plot_precision_recall,
                       plot_auc_roc, plot_feature_importances)
 
@@ -60,16 +58,13 @@ warnings.filterwarnings("ignore")
 def load_features(dir_path, labeled_test=False):
     """
     Load pre-processed feature matrices.
-
     Inputs:
         - labeled_test (bool): whether test data is labelled
-
     Returns:
         (N*m array) X_train, (n*m array) X_test,
         (N*1 array) y_train, (n*1 array or None) X_train
             where N is number of training observations, n is number of test
             observations. m is number of features.
-
     """
     X_train = np.load(dir_path + 'X_train.npy')
     y_train = np.load(dir_path + 'y_train.npy')
@@ -80,11 +75,18 @@ def load_features(dir_path, labeled_test=False):
     else:
         y_test = None
 
-    messages = read_feature_names(dir_path, "time_window.txt")
-    for message in messages:
-        logger.info(message)
-    logger.info("\n")
     return X_train, X_test, y_train, y_test
+
+
+def create_dirs(dir_path):
+    """
+    Create a new directory if it doesn't exist and add a '.gitkeep' file to the
+    directory.
+    """
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+        file = open(dir_path + ".gitkeep", "w+")
+        file.close()
 
 
 def start_clean():
@@ -92,7 +94,6 @@ def start_clean():
     Wipe all the folders and documents (predicted probabilities, visualizations,
     predictions, and evaluations the modeling pipeline produces and start clean
     as requested.
-
     """
     to_clean = [OUTPUT_DIR, PREDICTIONS_DIR, PREDICTIONS_DIR, VIZ_DIR,
                 PREDICTED_PROBS_DIR]
@@ -101,47 +102,80 @@ def start_clean():
         create_dirs(dir_path)
 
 
-class Precision:
+def ask(names, message):
+    """
+    Ask user for their choice of index for model or metrics.
+    Inputs:
+        - name (list of strings): name of choices
+        - message (str): type of index to request from user
+    Returns:
+        (int) index for either model or metrics
+    """
+    indices = []
+
+    print("\nUp till now we support:")
+    for i, name in enumerate(names):
+        print("%s. %s" % (i + 1, name))
+        indices.append(str(i + 1))
+
+    index = input("Please input a %s index:\n" % message)
+
+    if index in indices:
+        return int(index) - 1
+    else:
+        print("Input wrong. Type one in {} and hit Enter.".format(indices))
+        return ask(names, message)
+
+
+class MetricsK:
     """
     Constructed with given relative population threshold k to calculate
-    precision at k.
-
+    corresponding metrics at k.
     """
+    METRICS_DICT = {"accuracy": accuracy_score,
+                    "precision": precision_score,
+                    "recall": recall_score,
+                    "f1": f1_score,
+                    "roc_auc": roc_auc_score}
 
-    def __init__(self, k):
+    def __init__(self, metrics_name, k):
         """
         Construct a class to calculate model precision at population threshold
         k.
-
         Inputs:
             - k (int): population threshold k, where k is the percentage of
                 population at the highest probabilities to be classified as
                 "positive".
-
         """
+        self.metrics_name = metrics_name
         self.k = k
-        self.name = "Precision at {}%".format(k)
+        self.name = "{} at {}%".format(self.metrics_name.title(), k)
 
-    def precision_at_k(self, y_val, predicted_prob):
+    def metrics_at_k(self, y_val, predicted_prob):
         """
         Predict based on predicted probabilities and population threshold k,
         where k is the percentage of population at the highest probabilities to
         be classified as "positive". Label those with predicted probabilities
         higher than (1- k/100) quantile as positive, and evaluate the precision.
-
         Inputs:
             - predicted_prob (array): predicted probabilities on the validation
                 set.
             - y_val (array): of true labels.
-
         Returns:
             (float) precision score of our model at population threshold k.
-
         """
-        cut_off = np.quantile(predicted_prob, (1 - self.k / 100.0))
-        labels = [1 if prob >= cut_off else 0 for prob in predicted_prob]
+        idx = np.argsort(predicted_prob)[::-1]
+        sorted_prob, sorted_y_val = predicted_prob[idx], y_val[idx]
 
-        return precision_score(y_val, labels)
+        cutoff_index = int(len(sorted_prob) * (self.k / 100.0))
+        predictions_at_k = [1 if x < cutoff_index else 0 for x in
+                            range(len(sorted_prob))]
+
+        metrics = self.METRICS_DICT[self.metrics_name]
+        if self.metrics_name == "roc_auc":
+            return metrics(sorted_y_val, sorted_prob)
+        else:
+            return metrics(sorted_y_val, predictions_at_k)
 
 
 class ModelingPipeline:
@@ -151,7 +185,6 @@ class ModelingPipeline:
     and make predictions. Modify the class variables to add machine learning
     models, metrics, absolute decision thresholds and relative population
     thresholds, hyperparamter grids to search through.
-
     """
 
     MODEL_NAMES = ["Logistic Regression", "Decision Tree", "Random Forest",
@@ -161,16 +194,14 @@ class ModelingPipeline:
               BaggingClassifier, AdaBoostClassifier, GradientBoostingClassifier,
               ExtraTreesClassifier, GaussianNB, KNeighborsClassifier, LinearSVC]
 
-    METRICS_NAMES = ["accuracy", "precision", "recall", "f1", "roc_auc"]
-    METRICS = [accuracy_score, precision_score, recall_score, f1_score,
-               roc_auc_score]
+    THRESHOLDS = [1, 2, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90]
+    BASE_METRICS = ["accuracy", "precision", "recall", "f1", "roc_auc"]
 
-    DECISION_THRESHOLDS = [round(x, 1) for x in np.arange(0.1, 1, 0.1)]
-
-    POPULATION_THRESHOLDS = [1, 2, 5, 10, 20, 30, 50]
-    for k in POPULATION_THRESHOLDS:
-        METRICS.append(Precision(k).precision_at_k)
-        METRICS_NAMES.append(Precision(k).name)
+    METRICS = []
+    for m in BASE_METRICS:
+        for k in THRESHOLDS:
+            METRICS.append(MetricsK(m, k))
+    METRICS_NAMES = [m.name for m in METRICS]
 
     SEED = 123
 
@@ -187,28 +218,32 @@ class ModelingPipeline:
         },
 
         "Random Forest": {
-            'min_samples_split': np.arange(0.01, 0.11, 0.03),
+            'n_estimators': [100, 300, 500, 700, 1000],
             'max_depth': [5, 10, 15, 20],
             'max_features': None
         },
 
         "Bagging": {
+            'n_estimators': [100, 300, 500, 700, 1000],
             'max_samples': [0.05, 0.1, 0.3, 0.5, 0.7, 1.0],
             'max_features': None
         },
 
         "Ada Boosting": {
+            'n_estimators': [100, 300, 500, 700, 1000],
             'algorithm': {"SAMME", "SAMME.R"},
             'learning_rate': [0.001, 0.01, 0.1, 0.5, 1, 10]
         },
 
         "Gradient Boosting": {
+            'n_estimators': [100, 300, 500, 700, 1000],
             'learning_rate': [0.001, 0.01, 0.1, 1],
             'subsample': [0.05, 0.1, 0.3, 0.5, 0.7, 1.0],
             'max_depth': [5, 10, 15, 20]
         },
 
         "Extra Tree": {
+            'n_estimators': [100, 300, 500, 700, 1000],
             'min_samples_split': np.arange(0.01, 0.11, 0.03),
             'max_depth': [5, 10, 15, 20],
             'max_features': None
@@ -230,15 +265,15 @@ class ModelingPipeline:
 
     DEFAULT_ARGS = {"Logistic Regression": {'random_state': SEED},
                     "Decision Tree": {'random_state': SEED},
-                    "Random Forest": {'n_estimators': 1000,
-                                      'random_state': SEED,
-                                      'oob_score': True, 'n_jobs': -1},
-                    "Bagging": {'n_estimators': 500, 'random_state': SEED,
-                                'oob_score': True, 'n_jobs': -1},
-                    "Ada Boosting": {'n_estimators': 100, 'random_state': SEED},
-                    "Gradient Boosting": {'n_estimators': 100,
-                                          'random_state': SEED},
-                    "Extra Tree": {'n_estimators': 1000, 'random_state': SEED,
+                    "Random Forest": {'random_state': SEED,
+                                      'oob_score': True,
+                                      'n_jobs': -1},
+                    "Bagging": {'random_state': SEED,
+                                'oob_score': True,
+                                'n_jobs': -1},
+                    "Ada Boosting": {'random_state': SEED},
+                    "Gradient Boosting": {'random_state': SEED},
+                    "Extra Tree": {'random_state': SEED,
                                    'n_jobs': -1},
                     "Naive Bayes": {},
                     "KNN": {'n_jobs': -1},
@@ -248,13 +283,11 @@ class ModelingPipeline:
     def __init__(self, data, batch, cv=5, ask_user=True, verbose=1, plot=True):
         """
         Construct a preprocessing pipeline given name of the data file.
-
         Inputs:
             - cv (int): number of folds for cross-validation
             - ask_user (bool): whether to ask user for configuration
             - verbose (int): level of verbosity, can be either 0, 1, or 2
             - plot (bool): whether to include plots for visual evaluations
-
         """
         logger.info("##" + "-" * 160 + "##")
         self.cv = cv
@@ -293,12 +326,13 @@ class ModelingPipeline:
         self.default_args = None
         self.hyper_args, self.hyper_grids = None, None
         self.hyper_grid_index = 0
-        self.best_args = None
 
         # Set up classifier and cross-validation iterators
         self.clf = None
         self.skf = StratifiedKFold(n_splits=self.cv, random_state=self.SEED,
                                    shuffle=True)
+        self.model_cv_scores = None
+
         logger.info(("\t%s-fold cross-validation generator set up with "
                      "random seed '%s'.") % (self.cv, self.SEED))
 
@@ -307,10 +341,8 @@ class ModelingPipeline:
         Configure model of the pipeline with indices from user input or
         automate generation. Meanwhile set default arguments and define the
         hyperparameter grids for the classifier.
-
         Inputs:
             - model_index (int): index of the model for the pipeline
-
         """
         logger.info("##" + "-" * 160 + "##\n\n")
         logger.info("##" + "-" * 160 + "##")
@@ -329,22 +361,21 @@ class ModelingPipeline:
 
         hyper_grids = itertools.product(*(params_grid[hyper_arg]
                                           for hyper_arg in self.hyper_args))
-        self.hyper_grids = [tuple(map(lambda x: round(x, 3)
+        self.hyper_grids = [tuple(map(lambda x: round(x, 4)
                                                 if isinstance(x, float) else x,
                                       hyper_grid))
                             for hyper_grid in hyper_grids]
 
-        # Set up model with default arguments
+        # Set up model with default arguments and clear score array
         self.clf = self.MODELS[model_index](**self.default_args)
+        self.model_cv_scores = [[None] * len(self.METRICS)] * len(self.hyper_grids)
 
     def configure_metrics(self, metrics_index):
         """
         Configure metrics of the pipeline with indices from user input or
         automate generation.
-
         Inputs:
             - metrics_index (int): index of the metrics for the pipeline
-
         """
         logger.info("\n\n#" + "-" * 130 + "#")
         # Set metrics index and metrics name
@@ -354,19 +385,17 @@ class ModelingPipeline:
                     (self.batch, self.metrics_name.title()))
 
         # Set up the metrics
-        self.metrics = self.METRICS[metrics_index]
+        self.metrics = self.METRICS[metrics_index].metrics_at_k
 
     def save_prob(self, predicted_prob, file_path):
         """
         Save predicted probabilities of a fitted model on the validation
         set to the corresponding log directory.
-
         Inputs:
             - predicted_prob (array): predicted probabilities on the validation
                 set.
             - file_path (str): file name consists of directory, model index,
                 and hyperparameter set index.
-
         """
         if not os.path.isfile(file_path):
             np.save(file_path, predicted_prob, allow_pickle=False)
@@ -381,7 +410,6 @@ class ModelingPipeline:
         """
         Train a default Decision Tree as the benchmark, and report its
         performance. Or just load relevant information and print.
-
         """
         logger.info("\n\n<BATCH %s> Start to set benchmark for the metrics %s."
                     % (self.batch, self.metrics_name.title()))
@@ -393,13 +421,9 @@ class ModelingPipeline:
 
         if not self.benchmark_scores[self.metrics_index]:
             predicted_prob = self.benchmark.predict_proba(self.X_test)[:, 1]
-            if self.metrics_name.startswith("Precision at"):
-                self.benchmark_scores[self.metrics_index] = self.metrics(
-                    self.y_test, predicted_prob)
-            else:
-                labels = [1 if prob >= 0.5 else 0 for prob in predicted_prob]
-                self.benchmark_scores[self.metrics_index] = self.metrics(
-                    self.y_test, labels)
+            self.benchmark_scores[self.metrics_index] = self.metrics(
+                self.y_test,
+                predicted_prob)
 
         logger.info(("\t %s of the benchmark default Decision Tree model "
                      "is %4.3f.") % (self.metrics_name.title(),
@@ -411,10 +435,8 @@ class ModelingPipeline:
         probabilities for each observation. For classifiers that cannot
         provide predicted probabilities, get its standardized decision
         function.
-
         Returns:
             (array of floats) predicted probabilities
-
         """
         if hasattr(self.clf, "predict_proba"):
             predicted_prob = self.clf.predict_proba(X_val)[:, 1]
@@ -429,10 +451,8 @@ class ModelingPipeline:
         With a classifier that has default and hyperparameters set, make
         cross-validation predictions on the training set and returns predicted
         probabilities of training observations being positive.
-
         Returns:
             (list of floats) predicted probabilities on the training set
-
         """
         cv_prob = np.zeros(self.y_train.shape[0])
 
@@ -452,10 +472,8 @@ class ModelingPipeline:
         """
         Given a grid of hyperparameters, fit a model to get the predicted
         probabilities, or retrieve them from saved NumPy arrays.
-
         Inputs:
             - hyper_params ({str: float}): dict of a specific hyperparamter set
-
         Returns:
             (array of floats) predicted probabilities of the specific
                 hyperparameter set
@@ -481,38 +499,6 @@ class ModelingPipeline:
 
         return predicted_prob
 
-    def find_best_thresholds(self, predicted_prob, thresholds, y_true):
-        """
-        Make predictions at threshold k, where k is the percentage of
-        population at the highest probabilities to be classified as "positive".
-        Evaluate the predictions and find the best threshold to use for the
-        specific set of hyperparameters.
-
-        Inputs:
-            - predicted_prob (list of floats): predicted probabilities of
-                the training set
-
-        Returns:
-            - (list of ints): predicted labels for the test/validation set
-            - (float) best score the classifier achieves with the current set of
-                hyperparameters
-
-        """
-        grid_best_score = 0
-        grid_best_thresholds = []
-
-        for k in thresholds:
-            labels = [1 if prob >= k else 0 for prob in predicted_prob]
-            score = self.metrics(y_true, labels)
-
-            if score >= grid_best_score and score != 0:
-                if score > grid_best_score:
-                    grid_best_thresholds = []
-                grid_best_score = score
-                grid_best_thresholds.append(k)
-
-        return grid_best_thresholds, grid_best_score
-
     def tune(self):
         """
         Tune the classifier with certain metrics. Grid search through all the
@@ -520,11 +506,9 @@ class ModelingPipeline:
         where each is the percentage of population at the highest probabilities
         to be classified as "positive". Find the best sets of hyperparameters
         and thresholds configuration.
-
         Returns:
             config ({tuple: list}): mapping hyperparameter values to population
                 thresholds
-
         """
         logger.info(("\n\n<BATCH %s - %s to be optimized on %s> Search Starts "
                      "(%s hyperparameter sets):") % (self.batch,
@@ -533,38 +517,40 @@ class ModelingPipeline:
                                                      len(self.hyper_grids)))
 
         best_score = 0
-        best_config = dict()
+        best_config = []
         for hyper_grid in self.hyper_grids:
             hyper_params = dict(zip(self.hyper_args, hyper_grid))
 
-            predicted_prob = self.get_predicted_prob(hyper_params)
-            if not isinstance(predicted_prob, np.ndarray):
-                if self.verbose >= 1:
-                    logger.info(("\tSet %s --- (Parameters: %s) HYPERPARAMETER "
-                                 "SET NOT ALLOWED OR MODEL CANNOT CONVERGE. "
-                                 "ABORTED.") % (self.hyper_grid_index,
-                                                hyper_params))
-                self.hyper_grid_index += 1
-                continue
+            if not self.model_cv_scores[self.hyper_grid_index][self.metrics_index]:
+                predicted_prob = self.get_predicted_prob(hyper_params)
 
-            grid_thresholds, score = self.find_best_thresholds(predicted_prob,
-                                                               self.DECISION_THRESHOLDS,
-                                                               self.y_train)
-            if not grid_thresholds:
-                continue
+                if not isinstance(predicted_prob, np.ndarray):
+                    if self.verbose >= 1:
+                        logger.info(
+                            ("\tSet %s --- (Parameters: %s) HYPERPARAMETER "
+                             "SET NOT ALLOWED OR MODEL CANNOT CONVERGE. "
+                             "ABORTED.") % (self.hyper_grid_index,
+                                            hyper_params))
+
+                    self.hyper_grid_index += 1
+                    continue
+
+                score = self.metrics(self.y_train, predicted_prob)
+                self.model_cv_scores[self.hyper_grid_index][self.metrics_index] = score
+            else:
+                score = self.model_cv_scores[self.hyper_grid_index][self.metrics_index]
 
             if self.verbose >= 1:
                 logger.info(("\tSet %s --- (Parameters: %s) Cross-validation %s"
-                             " of %4.3f at the threshold(s) %s.") %
-                            (self.hyper_grid_index, hyper_params,
-                             self.metrics_name, score, grid_thresholds))
+                             " of %4.4f.") % (
+                            self.hyper_grid_index, hyper_params,
+                            self.metrics_name, score))
 
             if score >= best_score:
                 if score > best_score:
-                    best_config = dict()
+                    best_config = []
                 best_score = score
-                best_config[hyper_grid] = (self.hyper_grid_index,
-                                           grid_thresholds)
+                best_config.append((hyper_grid, self.hyper_grid_index))
 
             self.hyper_grid_index += 1
 
@@ -572,8 +558,7 @@ class ModelingPipeline:
 
         logger.info(("<BATCH %s - %s to be optimized on %s> Search Finished. "
                      "The highest cross-validation %s is %4.4f. There are %s "
-                     "best sets.") % (self.batch,
-                                      self.model_name,
+                     "best sets.") % (self.batch, self.model_name,
                                       self.metrics_name.title(),
                                       self.metrics_name, best_score,
                                       len(best_config)))
@@ -586,10 +571,8 @@ class ModelingPipeline:
         Plot the tuned models in to visually evaluate it in terms of predicted
         probabilities, precision-recall-population thresholds, area under curve,
         and feature importances. Images saved under "../logs/train/viz/".
-
         Inputs:
             - hyper_params ({str: float}): dict of a specific hyperparameter set
-
         """
         dir_path = VIZ_DIR + ("Batch %s/" % self.batch) + self.metrics_name + \
                    "/" + self.model_name + "/"
@@ -615,13 +598,10 @@ class ModelingPipeline:
 
     def create_eval_report(self, dir_path, file_name):
         """
-
-
         """
         if not os.path.isfile(dir_path + file_name):
             cols = ['ModelIndex', 'ModelName', 'HyperGridIndex', 'HyperParams',
-                    'TrainingTime (s)', 'TestTime (s)', 'Threshold'] +\
-                   self.METRICS_NAMES
+                    'TrainingTime (s)', 'TestTime (s)'] + self.METRICS_NAMES
             return pd.DataFrame(columns=cols)
         else:
             return pd.read_csv(dir_path + file_name)
@@ -630,15 +610,12 @@ class ModelingPipeline:
         """
         Fit a tuned model on the training set and make predictions on the test
         set.
-
         Inputs:
             - hyper_params ({str: float}): dict of a specific hyperparameter set
-
         Return:
             - train_time: training time in seconds
             - test_time: test time in seconds
             - labels: predicted labels on the test set
-
         """
         train_start = time.time()
         try:
@@ -656,13 +633,11 @@ class ModelingPipeline:
     def write_results(self, predicted_prob, thresholds):
         """
         Write results ready for submission.
-
         Inputs:
             - predicted_prob (list of floats): predicted probabilities of
                 the test set
             - thresholds (list of ints): corresponding population thresholds for
                 best performances
-
         """
         dir_path = PREDICTIONS_DIR + self.metrics_name + "/" \
                    + self.model_name + "/"
@@ -680,8 +655,6 @@ class ModelingPipeline:
 
     def train_eval(self):
         """
-
-
         """
         self.set_benchmark()
         best_config = self.tune()
@@ -691,45 +664,25 @@ class ModelingPipeline:
         file_name = "Batch %s - Evaluations.csv" % self.batch
         data = self.create_eval_report(dir_path, file_name)
 
-        for hyper_grid, (set_index, thresholds) in best_config.items():
+        for hyper_grid, set_index in best_config:
             self.hyper_grid_index = set_index
             hyper_params = dict(zip(self.hyper_args, hyper_grid))
             self.clf.set_params(**hyper_params)
 
             tr_time, ts_time, predicted_prob = self.predict()
-            if predicted_prob is None:
-                continue
-
             if self.plot:
                 self.plot_model(predicted_prob)
-
             temp = [self.model_index, self.model_name, self.hyper_grid_index,
                     hyper_params, tr_time, ts_time]
-            test_thresholds, _ = self.find_best_thresholds(predicted_prob,
-                                                           thresholds,
-                                                           self.y_test)
-            for k in test_thresholds:
-                line = temp[:] + [k]
-                labels = [1 if prob >= k else 0 for prob in predicted_prob]
-                for i, metrics in enumerate(self.METRICS):
-                    if self.METRICS_NAMES[i].startswith("Precision at"):
-                        line.append(metrics(self.y_test, predicted_prob))
-                    else:
-                        line.append(metrics(self.y_test, labels))
-                data.loc[len(data), :] = line
-            if self.metrics_name in ["precision", "recall"]:
-                if self.verbose >= 1:
-                    logger.info(("Precision or Recall. No need for further "
-                                 "evaluations. ABORTED."))
-                break
+            line = temp + [metrics.metrics_at_k(self.y_test, predicted_prob)
+                           for metrics in self.METRICS]
+            data.loc[len(data), :] = line
 
         data.to_csv(dir_path + file_name, index=False)
         self.hyper_grid_index = 0
 
     def run(self):
         """
-
-
         """
         if self.ask_user:
             model_index = ask(self.MODEL_NAMES, "model")

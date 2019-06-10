@@ -46,6 +46,11 @@ def save_fig(dir_path, extension, title, fig, dpi=300):
     fig_name = fig_dir_path + "%s.png" % (title)
     fig.savefig(fig_name, dpi=dpi)
 
+    fig.tight_layout()
+    plt.show(block=False)
+    plt.pause(3)
+    plt.close()
+
 
 def plot_predicted_scores(cv_scores, dir_path, title=""):
     """

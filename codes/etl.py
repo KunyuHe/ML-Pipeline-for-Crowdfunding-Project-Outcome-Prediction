@@ -30,8 +30,6 @@ if __name__ == "__main__":
     data['datefullyfunded'] = pd.to_datetime(data['datefullyfunded'])
     data[TARGET] = ((data['datefullyfunded'] - data['date_posted']) >
                      timedelta(days=LENGTH)).astype(float)
-
-    data.dropna(subset=['grade_level'], inplace=True)
     data.to_csv(OUTPUT_DIR + OUTPUT_FILE, index=False)
 
     print(("ETL process finished. Generated target for prediction as '{}' and"

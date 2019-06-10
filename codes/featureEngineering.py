@@ -175,7 +175,8 @@ class FeaturePipeLine:
     """
     TO_FILL_CON = {'students_reached'}
 
-    TO_FILL_OBJ = {'school_metro': None,
+    TO_FILL_OBJ = {'grade_level': None,
+                   'school_metro': None,
                    'school_district': "MISC",
                    'primary_focus_subject': "Other",
                    'primary_focus_area': "Other",
@@ -183,13 +184,11 @@ class FeaturePipeLine:
                    'secondary_focus_area': "MISC",
                    'resource_type': None}
 
-    TO_DISCRETIZE = {'total_price_including_optional_support': (True, 5, 0),
-                     'students_reached': (True, 5, 0),
-                     'school_longitude': (False, 8, 3),
-                     'school_latitude': (False, 3, 3)}
+    TO_DISCRETIZE = {}
 
-    TO_COMBINE = {'teacher_prefix': {"Mr.": ["Dr."]},
-                  'school_city': {"MISC": None},
+    TO_CREATE_CON = {}
+
+    TO_COMBINE = {'school_city': {"MISC": None},
                   'school_state': {"MISC": None},
                   'school_district': {"MISC": None},
                   'school_county': {"MISC": None},
@@ -203,7 +202,7 @@ class FeaturePipeLine:
                    'school_magnet': 'auto',
                    'eligible_double_your_impact_match': 'auto'}
 
-    TO_EXTRACT_DATE_TIME = {'date_posted': ["year", "month"]}
+    TO_EXTRACT_DATE_TIME = {}
 
     TO_ONE_HOT = ['school_city', 'school_state', 'school_district',
                   'school_county', 'school_metro', 'teacher_prefix',
@@ -217,7 +216,6 @@ class FeaturePipeLine:
 
     SCALERS = [StandardScaler, MinMaxScaler]
     SCALER_NAMES = ["Standard Scaler", "MinMax Scaler"]
-
 
     def __init__(self, batch, data, file_name=DATA_FILE, ask_user=True,
                  verbose=True, test=False):
@@ -303,6 +301,8 @@ class FeaturePipeLine:
                 logger.info("\tFilled missing values in '%s' with '%s'." %
                             (var, fill))
 
+        return self
+
     def discretize(self):
         """
         Discretizes continuous variables into multinomials.
@@ -333,6 +333,22 @@ class FeaturePipeLine:
 
             if bins > 2 and var not in self.extra_one_hot:
                 self.extra_one_hot.append(var)
+
+        return self
+
+    def con_create(self):
+        """
+        Create continuous variables with lambda functions on existing numerical
+        columns.
+
+        """
+        logger.info("\n\nStart to create new continuous variables.")
+        for new_var, (variables, func) in self.TO_CREATE_CON.items():
+            self.data[new_var] = func(*[self.data[var] for var in variables])
+
+            if self.verbose:
+                logger.info("\tFunction applied on variables %s to create '%s'"
+                            % (variables, new_var))
 
         return self
 
@@ -376,7 +392,7 @@ class FeaturePipeLine:
 
         for var, cats in self.TO_BINARIES.items():
             enc = OrdinalEncoder(categories=cats)
-            self.data[var] = enc.fit_transform(np.array(self.data[var]).\
+            self.data[var] = enc.fit_transform(np.array(self.data[var]).
                                                reshape(-1, 1))
 
         return self
@@ -403,6 +419,8 @@ class FeaturePipeLine:
                 if self.verbose:
                     logger.info("\tExtracted %s from '%s' into '%s'." %
                                 (extract, var, new_col))
+
+        return self
 
     def one_hot(self):
         """
@@ -450,6 +468,8 @@ class FeaturePipeLine:
                         % (["Train", "Test"][int(self.test)], file_name,
                            dir_path))
 
+        return self
+
     def compare_train_test(self):
         """
         Compare the features in the training and test set after preprocessing.
@@ -477,6 +497,8 @@ class FeaturePipeLine:
             if self.verbose:
                 logger.info("\t'%s' added to the %sth column of the test set "
                             "with all zeros." % (var, i))
+
+        return self
 
     def scale(self):
         """
@@ -520,7 +542,7 @@ class FeaturePipeLine:
 
         logger.info(("\n\nSaved the resulting NumPy matrices to directory '%s'. "
                      "Features are in 'X%s' and target is in 'y%s'.") %
-                     (dir_path, extension, extension))
+                    (dir_path, extension, extension))
 
     def preprocess(self):
         """
@@ -528,8 +550,10 @@ class FeaturePipeLine:
 
         """
         self.con_fill_na().str_fill_na()
-        self.discretize().to_combine().to_binary().extract_date()
-        self.one_hot().feature_target_split()
+        self.discretize().con_create()
+        self.to_combine().to_binary().extract_date().one_hot()
+
+        self.feature_target_split()
         if self.test:
             self.compare_train_test()
         self.scale().save_data()
