@@ -7,8 +7,6 @@
 
 
 
-*(Credit to other Contributors: Ziyu Ye, CAPP'20)*
-
 ## Introduction
 
 The task is to build a pipeline that predicts whether a crowdfunding project on will not get fully funded within 60 days of posting, based on data from `DonorChoose.org`.
@@ -211,12 +209,12 @@ The data spans Jan 1, 2012 to Dec 31, 2013. Each training - test pair is called 
 
 The following table shows the time spans of the four batches:
 
-| Batch   | Training                 | n_train | Testing                  | n_test |
-| ------- | ------------------------ | ------- | ------------------------ | ------ |
-| Batch 0 | 2012-01-01 to 2012-04-30 |         | 2012-06-30 to 2012-10-28 |        |
-| Batch 1 | 2012-01-01 to 2012-08-29 |         | 2012-10-29 to 2013-02-26 |        |
-| Batch 2 | 2012-01-01 to 2012-12-28 |         | 2013-02-27 to 2013-06-27 |        |
-| Batch 3 | 2012-01-01 to 2013-04-28 |         | 2013-06-28 to 2013-10-26 |        |
+| Batch   | Training                 | n_train | Testing                  | n_test | m (features count) |
+| ------- | ------------------------ | ------- | ------------------------ | ------ | ------------------ |
+| Batch 0 | 2012-01-01 to 2012-04-30 | 21179   | 2012-06-30 to 2012-10-28 | 22986  | 78                 |
+| Batch 1 | 2012-01-01 to 2012-08-29 | 34227   | 2012-10-29 to 2013-02-26 | 18009  | 83                 |
+| Batch 2 | 2012-01-01 to 2012-12-28 | 59061   | 2013-02-27 to 2013-06-27 | 13336  | 88                 |
+| Batch 3 | 2012-01-01 to 2013-04-28 | 74109   | 2013-06-28 to 2013-10-26 | 30021  | 89                 |
 
 *(Time Span of Training and Test Sets)*
 
