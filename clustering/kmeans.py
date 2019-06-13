@@ -114,6 +114,25 @@ class KMeansPipeline:
 
         return self
 
+    def get_sub_data(self, clusters):
+        """
+
+        :param cluster:
+        :return:
+        """
+        return self.data[self.data.Cluster.isin(clusters)]
+
+    def get_sub_features(self, clusters):
+        """
+
+        :param clusters:
+        :return:
+        """
+        rows = self.data[self.data.Cluster.isin(clusters)]
+
+    def describe_cluster(self, ):
+        pass
+
 
 if __name__ == "__main__":
     pass

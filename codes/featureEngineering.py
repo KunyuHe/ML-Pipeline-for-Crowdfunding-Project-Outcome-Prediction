@@ -186,7 +186,8 @@ class FeaturePipeLine:
 
     TO_DISCRETIZE = {}
 
-    TO_CREATE_CON = {}
+    TO_CREATE_CON = {'days_fully_funded': (['datefullyfunded', 'date_posted'],
+                                           lambda x, y: (x - y + pd.Timedelta(days=1)).dt.days)}
 
     TO_COMBINE = {'school_city': {"MISC": None},
                   'school_state': {"MISC": None},
@@ -202,7 +203,8 @@ class FeaturePipeLine:
                    'school_magnet': 'auto',
                    'eligible_double_your_impact_match': 'auto'}
 
-    TO_EXTRACT_DATE_TIME = {}
+    TO_EXTRACT_DATE_TIME = {'datefullyfunded': ["year", "month"],
+                            'date_posted': ["year", "month"]}
 
     TO_ONE_HOT = ['school_city', 'school_state', 'school_district',
                   'school_county', 'school_metro', 'teacher_prefix',

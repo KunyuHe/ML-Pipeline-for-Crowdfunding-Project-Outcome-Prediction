@@ -35,18 +35,18 @@ The pipeline currently supports **ten classification algorithms and eight evalua
 
 
 
-| Classification Algorithms | Metrics                                      |
-| ------------------------- | -------------------------------------------- |
-| Logistic Regression       | Accuracy                                     |
-| Decision Tree             | Precision                                    |
-| Random Forest             | Recall                                       |
-| Bagging                   | F-1 Score                                    |
-| Adaptive Boosting         | AUC ROC                                      |
-| Gradient Boosting         | Scalers                                      |
-| Extra Tree                | Standard Scaler                              |
-| Linear SVM                | Precision @ [1%, 2%, 5%, 10%, 20%, 30%, 50%] |
-| KNN                       |                                              |
-| Naïve Bayes               |                                              |
+| Classification Algorithms | Metrics                                                     |
+| ------------------------- | ----------------------------------------------------------- |
+| Logistic Regression       | Accuracy                                                    |
+| Decision Tree             | Precision                                                   |
+| Random Forest             | Recall                                                      |
+| Bagging                   | F-1 Score                                                   |
+| Adaptive Boosting         | AUC ROC                                                     |
+| Gradient Boosting         | Scalers                                                     |
+| Extra Tree                | Standard Scaler                                             |
+| Linear SVM                | Precision @ [1%, 2%, 5%, 10%, 20%, 30%, 50%, 70%, 80%, 90%] |
+| KNN                       | Recall @ [1%, 2%, 5%, 10%, 20%, 30%, 50%, 70%, 80%, 90%]    |
+| Naïve Bayes               |                                                             |
 
 *(Customizable Configurations for `train.py`)*
 
@@ -211,10 +211,10 @@ The following table shows the time spans of the four batches:
 
 | Batch   | Training                 | n_train | Testing                  | n_test | m (features count) |
 | ------- | ------------------------ | ------- | ------------------------ | ------ | ------------------ |
-| Batch 0 | 2012-01-01 to 2012-04-30 | 21179   | 2012-06-30 to 2012-10-28 | 22986  | 78                 |
-| Batch 1 | 2012-01-01 to 2012-08-29 | 34227   | 2012-10-29 to 2013-02-26 | 18009  | 83                 |
-| Batch 2 | 2012-01-01 to 2012-12-28 | 59061   | 2013-02-27 to 2013-06-27 | 13336  | 88                 |
-| Batch 3 | 2012-01-01 to 2013-04-28 | 74109   | 2013-06-28 to 2013-10-26 | 30021  | 89                 |
+| Batch 0 | 2012-01-01 to 2012-04-30 | 21179   | 2012-06-30 to 2012-10-28 | 22986  |                    |
+| Batch 1 | 2012-01-01 to 2012-08-29 | 34227   | 2012-10-29 to 2013-02-26 | 18009  |                    |
+| Batch 2 | 2012-01-01 to 2012-12-28 | 59061   | 2013-02-27 to 2013-06-27 | 13336  |                    |
+| Batch 3 | 2012-01-01 to 2013-04-28 | 74109   | 2013-06-28 to 2013-10-26 | 30021  |                    |
 
 *(Time Span of Training and Test Sets)*
 
