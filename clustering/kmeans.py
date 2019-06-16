@@ -241,8 +241,12 @@ class KMeansPipeline:
         plot_feature_importances(importances, col_names, "", top_n=depth,
                                  title=("Cluster %s against All Others" % cluster))
 
+        # hard-coded
         col_names = [name for name in col_names if "school_city" not in name]
-        plot_decision_tree(clf, col_names, "Cluster", "./")
+        col_names = [name.replace("&", "AND") for name in col_names]
+
+        dt_graph = plot_decision_tree(clf, col_names, "Cluster")
+        return dt_graph
 
 
 if __name__ == "__main__":

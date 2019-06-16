@@ -10,10 +10,14 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pydotplus
+
 from matplotlib.font_manager import FontProperties
 from sklearn.metrics import roc_curve, auc, precision_recall_curve
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.preprocessing import label_binarize
+from sklearn.externals.six import StringIO
+from sklearn.tree import export_graphviz
 
 OUTPUT_DIR = "../logs/train/viz/"
 
@@ -198,3 +202,22 @@ def plot_feature_importances(importances, col_names, dir_path, top_n, title=""):
     plt.yticks(np.arange(top_n), labels, fontproperties=AXIS)
 
     save_fig(dir_path, "/feature importance/", title, fig)
+
+
+def plot_decision_tree(tree, feature_names, target_name):
+    """
+
+    :param tree:
+    :param feature_names:
+    :param target_name:
+    :return:
+    """
+    dot_data = StringIO()
+
+    export_graphviz(tree, out_file=dot_data, filled=True, rounded=True,
+                    special_characters=True, feature_names=feature_names,
+                    class_names=target_name, impurity=False)
+
+    graph = pydotplus.graph_from_dot_data(dot_data.getvalue())
+
+    return graph
